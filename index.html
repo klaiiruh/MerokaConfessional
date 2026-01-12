@@ -3,705 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meroka Confession</title>
+  <title>The Physician Confessional</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f1419;
-      color: #e8e2d9;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .ambient-glow {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 400px;
-      background: radial-gradient(ellipse, rgba(204,85,0,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    header {
-      position: relative;
-      z-index: 10;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-img {
-      border-radius: 8px;
-      width: 36px;
-      height: 36px;
-    }
-
-    .logo-text {
-      color: #e8e2d9;
-      font-weight: 600;
-      font-size: 18px;
-      letter-spacing: -0.01em;
-    }
-
-    .nav-btn {
-      background: transparent;
-      color: #e8e2d9;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      border: 1px solid rgba(232,226,217,0.15);
-    }
-
-    .nav-btn:hover {
-      background: rgba(232,226,217,0.05);
-      border-color: rgba(232,226,217,0.25);
-    }
-
-    /* Live Counter */
-    .live-counter {
-      text-align: center;
-      padding: 16px 20px;
-      margin: 0 auto 20px;
-      max-width: 640px;
-    }
-
-    .counter-inner {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: rgba(204,85,0,0.08);
-      border: 1px solid rgba(204,85,0,0.15);
-      border-radius: 50px;
-    }
-
-    .counter-dot {
-      width: 8px;
-      height: 8px;
-      background: #cc5500;
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    .counter-text {
-      font-size: 14px;
-      color: #cc5500;
-      font-weight: 500;
-    }
-
-    .counter-number {
-      font-weight: 700;
-    }
-
-    main {
-      position: relative;
-      z-index: 10;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 20px 24px 80px;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .hero-tag {
-      display: inline-block;
-      color: #cc5500;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-
-    .hero h1 {
-      font-size: clamp(32px, 6vw, 44px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
-      color: #e8e2d9;
-    }
-
-    .rotating-word {
-      display: inline-block;
-      position: relative;
-      color: #cc5500;
-      min-width: 200px;
-    }
-
-    .rotating-word .word {
-      display: inline-block;
-      position: relative;
-    }
-
-    .rotating-word .word::after {
-      content: "";
-      position: absolute;
-      bottom: 2px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: #cc5500;
-      opacity: 0.5;
-    }
-
-    .rotating-word .word.fade-out {
-      animation: fadeOut 0.3s ease forwards;
-    }
-
-    .rotating-word .word.fade-in {
-      animation: fadeIn 0.3s ease forwards;
-    }
-
-    @keyframes fadeOut {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-8px); }
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(8px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .hero p {
-      color: #7a756d;
-      font-size: 16px;
-      max-width: 400px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
-
-    .confession-box {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 28px;
-    }
-
-    .confession-input {
-      width: 100%;
-      min-height: 140px;
-      background: transparent;
-      border: none;
-      color: #e8e2d9;
-      font-size: 16px;
-      font-family: inherit;
-      line-height: 1.7;
-      resize: none;
-      outline: none;
-      cursor: text;
-    }
-
-    .confession-input:empty:before {
-      content: "I confess...";
-      color: #4a4640;
-      pointer-events: none;
-    }
-
-    .confession-input .highlight {
-      color: #0f1419;
-      background: #cc5500;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-weight: 600;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .confession-input .highlight:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #e8e2d9;
-      color: #0f1419;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 8px 12px;
-      border-radius: 6px;
-      white-space: nowrap;
-      z-index: 100;
-      margin-bottom: 6px;
-    }
-
-    .confession-input .highlight:hover::before {
-      content: "";
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: #e8e2d9;
-      margin-bottom: -4px;
-      z-index: 100;
-    }
-
-    .matched-words-indicator {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-      padding: 12px 14px;
-      background: rgba(204,85,0,0.08);
-      border-radius: 8px;
-      font-size: 13px;
-      color: #cc5500;
-    }
-
-    .matched-words-indicator.visible {
-      display: flex;
-    }
-
-    .matched-words-indicator svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-
-    .form-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .custom-select {
-      position: relative;
-    }
-
-    .custom-select-btn {
-      appearance: none;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #e8e2d9;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      outline: none;
-      padding-right: 36px;
-      width: 100%;
-      text-align: left;
-      position: relative;
-    }
-
-    .custom-select-btn::after {
-      content: "";
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a756d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-size: contain;
-      transition: transform 0.2s ease;
-    }
-
-    .custom-select.open .custom-select-btn::after {
-      transform: translateY(-50%) rotate(180deg);
-    }
-
-    .custom-select-btn:hover {
-      border-color: rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.05);
-    }
-
-    .custom-select-btn.placeholder {
-      color: #7a756d;
-    }
-
-    .custom-select-dropdown {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      min-width: 100%;
-      background: #1a1f26;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      padding: 6px;
-      z-index: 100;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-4px);
-      transition: all 0.2s ease;
-      max-height: 240px;
-      overflow-y: auto;
-    }
-
-    .custom-select-dropdown::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .custom-select-dropdown::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .custom-select-dropdown::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.15);
-      border-radius: 3px;
-    }
-
-    .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,0.25);
-    }
-
-    .custom-select.open .custom-select-dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .custom-select-option {
-      padding: 10px 12px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #e8e2d9;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .custom-select-option:hover {
-      background: rgba(204,85,0,0.15);
-      color: #cc5500;
-    }
-
-    .custom-select-option.selected {
-      background: #cc5500;
-      color: #fff;
-    }
-
-    .submit-btn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      background: rgba(255,255,255,0.05);
-      color: #4a4640;
-    }
-
-    .submit-btn.active {
-      background: #cc5500;
-      color: #fff;
-    }
-
-    .submit-btn.active:hover {
-      background: #e05f00;
-      transform: translateY(-1px);
-    }
-
-    .disclaimer {
-      text-align: center;
-      color: #4a4640;
-      font-size: 13px;
-      margin-top: 20px;
-    }
-
-    .post-submission {
-      display: none;
-    }
-
-    .post-submission.visible {
-      display: block;
-    }
-
-    .thank-you {
-      text-align: center;
-      margin-bottom: 48px;
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    .thank-you-icon {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      background: rgba(204,85,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .thank-you-icon:hover {
-      transform: scale(1.1);
-      background: rgba(204,85,0,0.2);
-    }
-
-    .thank-you-icon svg {
-      width: 28px;
-      height: 28px;
-      color: #cc5500;
-    }
-
-    .thank-you-icon.animate svg {
-      animation: checkDraw 0.6s ease-out forwards;
-    }
-
-    @keyframes checkDraw {
-      0% {
-        stroke-dasharray: 50;
-        stroke-dashoffset: 50;
-      }
-      100% {
-        stroke-dasharray: 50;
-        stroke-dashoffset: 0;
-      }
-    }
-
-    .thank-you-icon.clicked {
-      animation: celebratePop 0.4s ease-out;
-    }
-
-    @keyframes celebratePop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-      100% { transform: scale(1); }
-    }
-
-    .thank-you h2 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #e8e2d9;
-    }
-
-    .thank-you p {
-      color: #7a756d;
-      font-size: 16px;
-    }
-
-    /* User's Confession Highlight */
-    .user-confession-highlight {
-      background: linear-gradient(135deg, #cc5500 0%, #e86a17 100%);
-      border-radius: 16px;
-      padding: 24px 28px;
-      margin-bottom: 40px;
-      animation: fadeIn 0.6s ease-out;
-    }
-
-    .user-confession-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 12px;
-    }
-
-    .user-confession-text {
-      font-size: 18px;
-      font-weight: 500;
-      line-height: 1.6;
-      color: #fff;
-      font-style: italic;
-    }
-
-    .user-confession-text::before {
-      content: '"';
-    }
-
-    .user-confession-text::after {
-      content: '"';
-    }
-
-    .confessions-feed {
-      margin-bottom: 48px;
-    }
-
-    .confession-card {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 12px;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: all 0.4s ease;
-    }
-
-    .confession-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .confession-card p {
-      color: #c4bfb6;
-      font-size: 15px;
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-
-    .confession-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: #5a554d;
-    }
-
-    .cta-section {
-      text-align: center;
-      padding: 36px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.06);
-      opacity: 0;
-      transform: translateY(12px);
-      transition: all 0.5s ease;
-    }
-
-    .cta-section.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .cta-tag {
-      display: inline-block;
-      color: #cc5500;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .cta-section h3 {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #e8e2d9;
-    }
-
-    .cta-section > p {
-      color: #7a756d;
-      max-width: 380px;
-      margin: 0 auto 24px;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .social-link {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 16px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: #e8e2d9;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .social-link:hover {
-      background: #cc5500;
-      border-color: #cc5500;
-    }
-
-    .social-link svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    .pre-submission.hidden {
-      display: none;
-    }
-
-    footer {
-      text-align: center;
-      padding: 24px;
-      color: #4a4640;
-      font-size: 13px;
-      border-top: 1px solid rgba(255,255,255,0.04);
-    }
-
-    footer a {
-      color: #5a554d;
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    footer a:hover {
-      color: #cc5500;
-    }
-
-    @media (max-width: 600px) {
-      header { padding: 16px 20px; }
-      main { padding: 20px 20px 60px; }
-      .nav-btn { padding: 8px 14px; font-size: 13px; }
-      .social-links { flex-direction: column; }
-      .cta-section { padding: 28px 20px; }
-      .rotating-word { min-width: 140px; }
-    }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1419; color: #e8e2d9; min-height: 100vh; overflow-x: hidden; }
+    .ambient-glow { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 800px; height: 400px; background: radial-gradient(ellipse, rgba(204,85,0,0.08) 0%, transparent 70%); pointer-events: none; }
+    header { position: relative; z-index: 10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-img { border-radius: 8px; width: 36px; height: 36px; }
+    .logo-text { color: #e8e2d9; font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
+    .nav-btn { background: transparent; color: #e8e2d9; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; transition: all 0.2s ease; border: 1px solid rgba(232,226,217,0.15); }
+    .nav-btn:hover { background: rgba(232,226,217,0.05); border-color: rgba(232,226,217,0.25); }
+    .live-counter { text-align: center; padding: 16px 20px; margin: 0 auto 20px; max-width: 640px; }
+    .counter-inner { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(204,85,0,0.08); border: 1px solid rgba(204,85,0,0.15); border-radius: 50px; }
+    .counter-dot { width: 8px; height: 8px; background: #cc5500; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+    .counter-text { font-size: 14px; color: #cc5500; font-weight: 500; }
+    .counter-number { font-weight: 700; }
+    main { position: relative; z-index: 10; max-width: 640px; margin: 0 auto; padding: 20px 24px 80px; }
+    .hero { text-align: center; margin-bottom: 40px; }
+    .hero-tag { display: inline-block; color: #cc5500; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(32px, 6vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 16px; color: #e8e2d9; }
+    .rotating-word { display: inline-block; position: relative; color: #cc5500; min-width: 200px; }
+    .rotating-word .word { display: inline-block; position: relative; }
+    .rotating-word .word::after { display: none; }
+    .rotating-word .word.fade-out { animation: fadeOut 0.3s ease forwards; }
+    .rotating-word .word.fade-in { animation: fadeIn 0.3s ease forwards; }
+    @keyframes fadeOut { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-8px); } }
+    @keyframes fadeIn { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
+    .hero p { color: #7a756d; font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6; }
+    .confession-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 28px; }
+    .confession-input { width: 100%; min-height: 140px; background: transparent; border: none; color: #e8e2d9; font-size: 16px; font-family: inherit; line-height: 1.7; resize: none; outline: none; cursor: text; }
+    .confession-input:empty:before { content: "I confess..."; color: #4a4640; pointer-events: none; }
+    .confession-input .highlight { color: #0f1419; background: #cc5500; padding: 1px 6px; border-radius: 3px; font-weight: 600; position: relative; cursor: pointer; }
+    .confession-input .highlight:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #e8e2d9; color: #0f1419; font-size: 12px; font-weight: 500; padding: 8px 12px; border-radius: 6px; white-space: nowrap; z-index: 100; margin-bottom: 6px; }
+    .confession-input .highlight:hover::before { content: ""; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #e8e2d9; margin-bottom: -4px; z-index: 100; }
+    .matched-words-indicator { display: none; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 14px; background: rgba(204,85,0,0.08); border-radius: 8px; font-size: 13px; color: #cc5500; }
+    .matched-words-indicator.visible { display: flex; }
+    .matched-words-indicator svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .form-options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .custom-select { position: relative; }
+    .custom-select-btn { appearance: none; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 500; color: #e8e2d9; cursor: pointer; transition: all 0.2s ease; outline: none; padding-right: 36px; width: 100%; text-align: left; position: relative; }
+    .custom-select-btn::after { content: ""; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a756d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-size: contain; transition: transform 0.2s ease; }
+    .custom-select.open .custom-select-btn::after { transform: translateY(-50%) rotate(180deg); }
+    .custom-select-btn:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); }
+    .custom-select-btn.placeholder { color: #7a756d; }
+    .custom-select-dropdown { position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; background: #1a1f26; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); padding: 6px; z-index: 100; opacity: 0; visibility: hidden; transform: translateY(-4px); transition: all 0.2s ease; max-height: 240px; overflow-y: auto; }
+    .custom-select-dropdown::-webkit-scrollbar { width: 6px; }
+    .custom-select-dropdown::-webkit-scrollbar-track { background: transparent; }
+    .custom-select-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    .custom-select-dropdown::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+    .custom-select.open .custom-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .custom-select-option { padding: 10px 12px; font-size: 13px; font-weight: 500; color: #e8e2d9; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
+    .custom-select-option:hover { background: rgba(204,85,0,0.15); color: #cc5500; }
+    .custom-select-option.selected { background: #cc5500; color: #fff; }
+    .submit-btn { width: 100%; margin-top: 20px; padding: 14px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s ease; background: rgba(255,255,255,0.05); color: #4a4640; }
+    .submit-btn.active { background: #cc5500; color: #fff; }
+    .submit-btn.active:hover { background: #e05f00; transform: translateY(-1px); }
+    .disclaimer { text-align: center; color: #4a4640; font-size: 13px; margin-top: 20px; }
+    .post-submission { display: none; }
+    .post-submission.visible { display: block; }
+    .thank-you { text-align: center; margin-bottom: 48px; animation: fadeIn 0.5s ease-out; }
+    .thank-you-icon { width: 56px; height: 56px; margin: 0 auto 20px; border-radius: 50%; background: rgba(204,85,0,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+    .thank-you-icon:hover { transform: scale(1.1); background: rgba(204,85,0,0.2); }
+    .thank-you-icon svg { width: 28px; height: 28px; color: #cc5500; }
+    .thank-you-icon.animate svg { animation: checkDraw 0.6s ease-out forwards; }
+    @keyframes checkDraw { 0% { stroke-dasharray: 50; stroke-dashoffset: 50; } 100% { stroke-dasharray: 50; stroke-dashoffset: 0; } }
+    .thank-you-icon.clicked { animation: celebratePop 0.4s ease-out; }
+    @keyframes celebratePop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .thank-you h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #e8e2d9; }
+    .thank-you p { color: #7a756d; font-size: 16px; }
+    .user-confession-highlight { background: linear-gradient(135deg, #cc5500 0%, #e86a17 100%); border-radius: 16px; padding: 24px 28px; margin-bottom: 40px; animation: fadeIn 0.6s ease-out; }
+    .user-confession-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+    .user-confession-text { font-size: 18px; font-weight: 500; line-height: 1.6; color: #fff; font-style: italic; }
+    .user-confession-text::before { content: '"'; }
+    .user-confession-text::after { content: '"'; }
+    .confessions-feed { margin-bottom: 48px; }
+    .confession-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px; margin-bottom: 12px; opacity: 0; transform: translateY(12px); transition: all 0.4s ease; }
+    .confession-card.visible { opacity: 1; transform: translateY(0); }
+    .confession-card p { color: #c4bfb6; font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
+    .confession-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5a554d; }
+    .cta-section { text-align: center; padding: 36px; border-radius: 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); opacity: 0; transform: translateY(12px); transition: all 0.5s ease; }
+    .cta-section.visible { opacity: 1; transform: translateY(0); }
+    .cta-tag { display: inline-block; color: #cc5500; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+    .cta-section h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #e8e2d9; }
+    .cta-section > p { color: #7a756d; max-width: 380px; margin: 0 auto 24px; font-size: 14px; line-height: 1.6; }
+    .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .social-link { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #e8e2d9; text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
+    .social-link:hover { background: #cc5500; border-color: #cc5500; }
+    .social-link svg { width: 16px; height: 16px; }
+    .pre-submission.hidden { display: none; }
+    footer { text-align: center; padding: 24px; color: #4a4640; font-size: 13px; border-top: 1px solid rgba(255,255,255,0.04); }
+    footer a { color: #5a554d; text-decoration: none; transition: color 0.2s ease; }
+    footer a:hover { color: #cc5500; }
+    .anon-header { display: flex; }
+    .anon-header.hidden { display: none; }
+    .meroka-header { display: none; }
+    .meroka-header.visible { display: flex; }
+    .anon-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #cc5500, #e86a17); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .anon-logo-icon svg { width: 20px; height: 20px; color: #fff; }
+    .anon-tag { font-size: 13px; color: #7a756d; }
+    @media (max-width: 600px) { header { padding: 16px 20px; } main { padding: 20px 20px 60px; } .nav-btn { padding: 8px 14px; font-size: 13px; } .social-links { flex-direction: column; } .cta-section { padding: 28px 20px; } .rotating-word { min-width: 140px; } }
   </style>
 </head>
 <body>
   <div class="ambient-glow"></div>
 
-  <header>
+  <header class="anon-header" id="anonHeader">
     <div class="logo">
-      <img
-        src="https://res.cloudinary.com/diqtonqy6/image/upload/v1768236979/5f5c6c7a-9e84-4d11-9a6e-77305143cc44_thumb_pyg9rj.png" 
-        alt="Meroka Logo" 
-        width="50" 
-        height="50" 
-        class="logo-img">
-      <span class="logo-text">Meroka</span>
+      <div class="anon-logo-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      </div>
+      <span class="logo-text">The Confessional</span>
+    </div>
+    <span class="anon-tag">By a fellow physician</span>
+  </header>
+
+  <header class="meroka-header" id="merokaHeader">
+    <div class="logo">
+       <div class="anon-logo-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      </div>
+      <span class="logo-text">The Confessional</span>
     </div>
     <a href="https://www.meroka.com/contact" target="_blank" class="nav-btn">Explore partnership</a>
   </header>
 
-  <!-- Live Counter -->
   <div class="live-counter">
     <div class="counter-inner">
       <div class="counter-dot"></div>
@@ -711,21 +139,17 @@
 
   <main class="pre-submission" id="preSubmission">
     <div class="hero">
-      <span class="hero-tag">The Meroka Confessional</span>
+      <span class="hero-tag">The Physician Confessional</span>
       <h1>What's <span class="rotating-word"><span class="word" id="rotatingWord">destroying</span></span> you?</h1>
       <p>For independent physicians done playing by the rules.</p>
     </div>
 
     <div class="confession-box">
       <div class="confession-input" id="confessionInput" contenteditable="true"></div>
-      
       <div class="matched-words-indicator" id="matchedIndicator">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <span>Hover highlighted words to see how many physicians share your frustration</span>
       </div>
-      
       <div class="form-options">
         <div class="custom-select" id="specialtySelect">
           <button type="button" class="custom-select-btn placeholder">Specialty (optional)</button>
@@ -740,7 +164,6 @@
             <div class="custom-select-option" data-value="other">Other</div>
           </div>
         </div>
-        
         <div class="custom-select" id="yearsSelect">
           <button type="button" class="custom-select-btn placeholder">Years independent (optional)</button>
           <div class="custom-select-dropdown">
@@ -750,225 +173,94 @@
             <div class="custom-select-option" data-value="10+">10+ years</div>
           </div>
         </div>
-
         <div class="custom-select" id="stateSelect">
           <button type="button" class="custom-select-btn placeholder">State (optional)</button>
           <div class="custom-select-dropdown">
             <div class="custom-select-option" data-value="AL">Alabama</div>
             <div class="custom-select-option" data-value="AK">Alaska</div>
             <div class="custom-select-option" data-value="AZ">Arizona</div>
-            <div class="custom-select-option" data-value="AR">Arkansas</div>
             <div class="custom-select-option" data-value="CA">California</div>
             <div class="custom-select-option" data-value="CO">Colorado</div>
-            <div class="custom-select-option" data-value="CT">Connecticut</div>
-            <div class="custom-select-option" data-value="DE">Delaware</div>
             <div class="custom-select-option" data-value="FL">Florida</div>
             <div class="custom-select-option" data-value="GA">Georgia</div>
-            <div class="custom-select-option" data-value="HI">Hawaii</div>
-            <div class="custom-select-option" data-value="ID">Idaho</div>
             <div class="custom-select-option" data-value="IL">Illinois</div>
-            <div class="custom-select-option" data-value="IN">Indiana</div>
-            <div class="custom-select-option" data-value="IA">Iowa</div>
-            <div class="custom-select-option" data-value="KS">Kansas</div>
-            <div class="custom-select-option" data-value="KY">Kentucky</div>
-            <div class="custom-select-option" data-value="LA">Louisiana</div>
-            <div class="custom-select-option" data-value="ME">Maine</div>
-            <div class="custom-select-option" data-value="MD">Maryland</div>
-            <div class="custom-select-option" data-value="MA">Massachusetts</div>
-            <div class="custom-select-option" data-value="MI">Michigan</div>
-            <div class="custom-select-option" data-value="MN">Minnesota</div>
-            <div class="custom-select-option" data-value="MS">Mississippi</div>
-            <div class="custom-select-option" data-value="MO">Missouri</div>
-            <div class="custom-select-option" data-value="MT">Montana</div>
-            <div class="custom-select-option" data-value="NE">Nebraska</div>
-            <div class="custom-select-option" data-value="NV">Nevada</div>
-            <div class="custom-select-option" data-value="NH">New Hampshire</div>
-            <div class="custom-select-option" data-value="NJ">New Jersey</div>
-            <div class="custom-select-option" data-value="NM">New Mexico</div>
             <div class="custom-select-option" data-value="NY">New York</div>
-            <div class="custom-select-option" data-value="NC">North Carolina</div>
-            <div class="custom-select-option" data-value="ND">North Dakota</div>
-            <div class="custom-select-option" data-value="OH">Ohio</div>
-            <div class="custom-select-option" data-value="OK">Oklahoma</div>
-            <div class="custom-select-option" data-value="OR">Oregon</div>
-            <div class="custom-select-option" data-value="PA">Pennsylvania</div>
-            <div class="custom-select-option" data-value="RI">Rhode Island</div>
-            <div class="custom-select-option" data-value="SC">South Carolina</div>
-            <div class="custom-select-option" data-value="SD">South Dakota</div>
-            <div class="custom-select-option" data-value="TN">Tennessee</div>
             <div class="custom-select-option" data-value="TX">Texas</div>
-            <div class="custom-select-option" data-value="UT">Utah</div>
-            <div class="custom-select-option" data-value="VT">Vermont</div>
-            <div class="custom-select-option" data-value="VA">Virginia</div>
-            <div class="custom-select-option" data-value="WA">Washington</div>
-            <div class="custom-select-option" data-value="WV">West Virginia</div>
-            <div class="custom-select-option" data-value="WI">Wisconsin</div>
-            <div class="custom-select-option" data-value="WY">Wyoming</div>
-            <div class="custom-select-option" data-value="DC">Washington D.C.</div>
-            <div class="custom-select-option" data-value="other">Other / Outside US</div>
+            <div class="custom-select-option" data-value="PA">Pennsylvania</div>
+            <div class="custom-select-option" data-value="other">Other</div>
           </div>
         </div>
       </div>
-
       <button class="submit-btn" id="submitBtn">Release the weight</button>
     </div>
-
     <p class="disclaimer">Your confession is completely anonymous.</p>
   </main>
 
   <main class="post-submission" id="postSubmission">
     <div class="thank-you">
       <div class="thank-you-icon" id="thankYouIcon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" id="checkmarkSvg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" id="checkPath"></path>
-        </svg>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
       </div>
       <h2>You're not alone.</h2>
       <p>See what other physicians have confessed.</p>
     </div>
-
-    <!-- User's Confession Highlight -->
-    <div class="user-confession-highlight" id="userConfessionHighlight">
+    <div class="user-confession-highlight">
       <p class="user-confession-label">Your confession</p>
       <p class="user-confession-text" id="userConfessionText"></p>
     </div>
-
     <div class="confessions-feed" id="confessionsFeed"></div>
-
     <div class="cta-section" id="ctaSection">
       <span class="cta-tag">Coming Soon</span>
-      <h3>Meroka Collective is under construction.</h3>
-      <p>We're building something for physicians who refuse to let the system break them.</p>
-      
+      <h3>A New Collective is underway.</h3>
+      <p>We are engineering a clinical mutiny—giving the power back to the doctors the system tried to crush.</p>
       <div class="social-links">
-        <a href="https://x.com/MerokaInc" target="_blank" class="social-link">
-          <svg fill="currentColor" viewBox="0 0 24 24">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-          </svg>
-          <span>X</span>
-        </a>
-        <a href="https://www.linkedin.com/company/merokainc/" target="_blank" class="social-link">
-          <svg fill="currentColor" viewBox="0 0 24 24">
-            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
-          </svg>
-          <span>LinkedIn</span>
-        </a>
-        <a href="https://www.meroka.com/" target="_blank" class="social-link">
-          <svg fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path>
-          </svg>
-          <span>Website</span>
-        </a>
+        <a href="https://x.com/MerokaInc" target="_blank" class="social-link"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>X</span></a>
+        <a href="https://www.linkedin.com/company/merokainc/" target="_blank" class="social-link"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span>LinkedIn</span></a>
+        <a href="https://www.meroka.com/" target="_blank" class="social-link"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><span>Website</span></a>
       </div>
     </div>
   </main>
 
-  <footer>
+  <footer id="footer">
     <p>© 2026 Meroka Inc. All rights reserved.</p>
     <p style="margin-top: 6px;"><a href="https://www.meroka.com/privacy" target="_blank">Privacy</a> · <a href="https://www.meroka.com/terms" target="_blank">Terms</a></p>
   </footer>
 
   <script>
-    // Live counter animation
     var counterEl = document.getElementById("confessionCount");
     var baseCount = 847;
-    
     function incrementCounter() {
-      var randomDelay = Math.random() * 15000 + 10000;
       setTimeout(function() {
         baseCount++;
         counterEl.textContent = baseCount;
-        counterEl.style.transform = "scale(1.1)";
-        setTimeout(function() {
-          counterEl.style.transform = "scale(1)";
-        }, 200);
         incrementCounter();
-      }, randomDelay);
+      }, Math.random() * 15000 + 10000);
     }
     incrementCounter();
 
-    // Rotating words
     var rotatingWords = ["destroying", "breaking", "exhausting", "draining", "overwhelming", "crushing", "burying", "suffocating"];
     var currentIndex = 0;
     var wordEl = document.getElementById("rotatingWord");
-
-    function rotateWord() {
+    setInterval(function() {
       wordEl.classList.add("fade-out");
-      
       setTimeout(function() {
         currentIndex = (currentIndex + 1) % rotatingWords.length;
         wordEl.textContent = rotatingWords[currentIndex];
         wordEl.classList.remove("fade-out");
         wordEl.classList.add("fade-in");
-        
-        setTimeout(function() {
-          wordEl.classList.remove("fade-in");
-        }, 300);
+        setTimeout(function() { wordEl.classList.remove("fade-in"); }, 300);
       }, 300);
-    }
+    }, 2500);
 
-    setInterval(rotateWord, 2500);
-
-    var commonKeywords = {
-      "burnout": { count: 847, percentage: 89 },
-      "exhausted": { count: 623, percentage: 84 },
-      "overwhelmed": { count: 589, percentage: 82 },
-      "alone": { count: 445, percentage: 78 },
-      "drowning": { count: 312, percentage: 76 },
-      "frustrated": { count: 534, percentage: 81 },
-      "stressed": { count: 478, percentage: 79 },
-      "tired": { count: 567, percentage: 83 },
-      "insurance": { count: 892, percentage: 91 },
-      "prior authorization": { count: 756, percentage: 88 },
-      "prior auth": { count: 423, percentage: 85 },
-      "denied": { count: 645, percentage: 86 },
-      "reimbursement": { count: 534, percentage: 82 },
-      "underpaid": { count: 234, percentage: 74 },
-      "billing": { count: 445, percentage: 77 },
-      "coding": { count: 312, percentage: 71 },
-      "administrative": { count: 678, percentage: 87 },
-      "paperwork": { count: 567, percentage: 84 },
-      "documentation": { count: 489, percentage: 80 },
-      "ehr": { count: 534, percentage: 83 },
-      "emr": { count: 423, percentage: 79 },
-      "charting": { count: 378, percentage: 76 },
-      "staff": { count: 456, percentage: 78 },
-      "turnover": { count: 345, percentage: 75 },
-      "hiring": { count: 289, percentage: 72 },
-      "admin": { count: 10000, percentage: 100 }, 
-      "understaffed": { count: 234, percentage: 73 },
-      "payroll": { count: 198, percentage: 68 },
-      "overhead": { count: 267, percentage: 71 },
-      "rent": { count: 178, percentage: 65 },
-      "cash flow": { count: 234, percentage: 72 },
-      "debt": { count: 198, percentage: 69 },
-      "loans": { count: 167, percentage: 66 },
-      "struggling": { count: 423, percentage: 79 },
-      "survive": { count: 234, percentage: 74 },
-      "quit": { count: 345, percentage: 77 },
-      "leaving": { count: 289, percentage: 73 },
-      "retire": { count: 198, percentage: 68 },
-      "patients": { count: 723, percentage: 85 },
-      "time": { count: 656, percentage: 84 },
-      "hours": { count: 534, percentage: 81 },
-      "weekends": { count: 312, percentage: 75 },
-      "family": { count: 423, percentage: 78 },
-      "balance": { count: 378, percentage: 76 },
-      "health": { count: 345, percentage: 74 },
-      "sleep": { count: 289, percentage: 72 },
-      "anxiety": { count: 312, percentage: 75 },
-      "depression": { count: 234, percentage: 73 },
-      "isolated": { count: 198, percentage: 71 },
-      "unsupported": { count: 178, percentage: 69 }
-    };
+    var commonKeywords = {"burnout":{count:847,percentage:89},"exhausted":{count:623,percentage:84},"overwhelmed":{count:589,percentage:82},"alone":{count:445,percentage:78},"drowning":{count:312,percentage:76},"frustrated":{count:534,percentage:81},"stressed":{count:478,percentage:79},"tired":{count:567,percentage:83},"insurance":{count:892,percentage:91},"prior authorization":{count:756,percentage:88},"prior auth":{count:423,percentage:85},"denied":{count:645,percentage:86},"reimbursement":{count:534,percentage:82},"underpaid":{count:234,percentage:74},"billing":{count:445,percentage:77},"coding":{count:312,percentage:71},"administrative":{count:678,percentage:87},"paperwork":{count:567,percentage:84},"documentation":{count:489,percentage:80},"ehr":{count:534,percentage:83},"emr":{count:423,percentage:79},"charting":{count:378,percentage:76},"staff":{count:456,percentage:78},"turnover":{count:345,percentage:75},"hiring":{count:289,percentage:72},"admin":{count:10000,percentage:100},"understaffed":{count:234,percentage:73},"payroll":{count:198,percentage:68},"overhead":{count:267,percentage:71},"rent":{count:178,percentage:65},"cash flow":{count:234,percentage:72},"debt":{count:198,percentage:69},"loans":{count:167,percentage:66},"struggling":{count:423,percentage:79},"survive":{count:234,percentage:74},"quit":{count:345,percentage:77},"leaving":{count:289,percentage:73},"retire":{count:198,percentage:68},"patients":{count:723,percentage:85},"time":{count:656,percentage:84},"hours":{count:534,percentage:81},"weekends":{count:312,percentage:75},"family":{count:423,percentage:78},"balance":{count:378,percentage:76},"health":{count:345,percentage:74},"sleep":{count:289,percentage:72},"anxiety":{count:312,percentage:75},"depression":{count:234,percentage:73},"isolated":{count:198,percentage:71},"unsupported":{count:178,percentage:69}};
 
     var confessions = [
-      { text: "I spent 3 hours on prior authorizations yesterday instead of seeing patients. This isn't why I became a doctor.", time: "2 hours ago", specialty: "Family Medicine", state: "California" },
-      { text: "Insurance denied a life-saving medication for my patient. Again. I'm exhausted fighting battles that shouldn't exist.", time: "5 hours ago", specialty: "Oncology", state: "New York" },
-      { text: "My staff turnover is killing me. I can't compete with hospital salaries and I'm drowning.", time: "8 hours ago", specialty: "Internal Medicine", state: "Texas" },
-      { text: "I love being independent but I feel completely alone. No one to strategize with, no one who gets it.", time: "12 hours ago", specialty: "Pediatrics", state: "Florida" },
-      { text: "Reimbursements keep shrinking while my costs keep rising. How much longer can I keep the lights on?", time: "1 day ago", specialty: "Cardiology", state: "Illinois" },
-      { text: "I went into medicine to heal people, not to become a full-time administrator who occasionally practices medicine.", time: "1 day ago", specialty: "Dermatology", state: "Pennsylvania" },
+      {text:"I spent 3 hours on prior authorizations yesterday instead of seeing patients. This isn't why I became a doctor.",time:"2 hours ago",specialty:"Family Medicine",state:"California"},
+      {text:"Insurance denied a life-saving medication for my patient. Again. I'm exhausted fighting battles that shouldn't exist.",time:"5 hours ago",specialty:"Oncology",state:"New York"},
+      {text:"My staff turnover is killing me. I can't compete with hospital salaries and I'm drowning.",time:"8 hours ago",specialty:"Internal Medicine",state:"Texas"},
+      {text:"I love being independent but I feel completely alone. No one to strategize with, no one who gets it.",time:"12 hours ago",specialty:"Pediatrics",state:"Florida"},
+      {text:"Reimbursements keep shrinking while my costs keep rising. How much longer can I keep the lights on?",time:"1 day ago",specialty:"Cardiology",state:"Illinois"},
+      {text:"I went into medicine to heal people, not to become a full-time administrator who occasionally practices medicine.",time:"1 day ago",specialty:"Dermatology",state:"Pennsylvania"}
     ];
 
     var inputEl = document.getElementById("confessionInput");
@@ -976,229 +268,56 @@
     var matchedIndicator = document.getElementById("matchedIndicator");
     var isProcessing = false;
 
-    function escapeRegex(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    function getTextContent(element) {
-      return element.innerText || element.textContent || "";
-    }
-
-    function countWords(text) {
-      var words = text.trim().split(/\s+/);
-      if (words.length === 1 && words[0] === "") {
-        return 0;
-      }
-      return words.length;
-    }
-
-    function saveCursorPosition(element) {
-      var selection = window.getSelection();
-      if (selection.rangeCount === 0) return null;
-      
-      var range = selection.getRangeAt(0);
-      var preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(element);
-      preCaretRange.setEnd(range.endContainer, range.endOffset);
-      return preCaretRange.toString().length;
-    }
-
-    function restoreCursorPosition(element, position) {
-      if (position === null) return;
-      
-      var selection = window.getSelection();
-      var range = document.createRange();
-      
-      var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
-      var currentPos = 0;
-      var node;
-      
-      while (node = walker.nextNode()) {
-        var nodeLength = node.textContent.length;
-        if (currentPos + nodeLength >= position) {
-          range.setStart(node, position - currentPos);
-          range.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          return;
-        }
-        currentPos += nodeLength;
-      }
-      
-      range.selectNodeContents(element);
-      range.collapse(false);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
+    function getTextContent(el) { return el.innerText || el.textContent || ""; }
+    function countWords(t) { var w = t.trim().split(/\s+/); return w.length === 1 && w[0] === "" ? 0 : w.length; }
+    function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+    function saveCursor(el) { var sel = window.getSelection(); if (!sel.rangeCount) return null; var r = sel.getRangeAt(0), pr = r.cloneRange(); pr.selectNodeContents(el); pr.setEnd(r.endContainer, r.endOffset); return pr.toString().length; }
+    function restoreCursor(el, pos) { if (pos === null) return; var sel = window.getSelection(), range = document.createRange(), walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false), cur = 0, node; while (node = walker.nextNode()) { if (cur + node.textContent.length >= pos) { range.setStart(node, pos - cur); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); return; } cur += node.textContent.length; } range.selectNodeContents(el); range.collapse(false); sel.removeAllRanges(); sel.addRange(range); }
 
     function highlightKeywords() {
       if (isProcessing) return;
       isProcessing = true;
-
-      var text = getTextContent(inputEl);
-      var cursorPos = saveCursorPosition(inputEl);
-      var hasMatches = false;
-
-      var sortedKeywords = Object.keys(commonKeywords).sort(function(a, b) {
-        return b.length - a.length;
-      });
-
-      var highlightedText = text;
-      var replacements = [];
-
-      sortedKeywords.forEach(function(keyword) {
-        var regex = new RegExp("\\b(" + escapeRegex(keyword) + ")\\b", "gi");
-        var match;
-        while ((match = regex.exec(text)) !== null) {
-          replacements.push({
-            start: match.index,
-            end: match.index + match[0].length,
-            word: match[0],
-            keyword: keyword
-          });
-        }
-      });
-
-      replacements.sort(function(a, b) { return a.start - b.start; });
+      var text = getTextContent(inputEl), cursorPos = saveCursor(inputEl), hasMatches = false;
+      var sortedKw = Object.keys(commonKeywords).sort(function(a,b){return b.length-a.length;});
+      var highlighted = text, reps = [];
+      sortedKw.forEach(function(kw) { var re = new RegExp("\\b("+escapeRegex(kw)+")\\b","gi"), m; while((m=re.exec(text))!==null) reps.push({start:m.index,end:m.index+m[0].length,word:m[0],keyword:kw}); });
+      reps.sort(function(a,b){return a.start-b.start;});
       var filtered = [];
-      replacements.forEach(function(rep) {
-        var dominated = filtered.some(function(existing) {
-          return rep.start >= existing.start && rep.end <= existing.end;
-        });
-        if (!dominated) {
-          filtered = filtered.filter(function(existing) {
-            return !(existing.start >= rep.start && existing.end <= rep.end);
-          });
-          filtered.push(rep);
-        }
-      });
-
-      if (filtered.length > 0) {
-        hasMatches = true;
-        filtered.sort(function(a, b) { return b.start - a.start; });
-        
-        filtered.forEach(function(rep) {
-          var data = commonKeywords[rep.keyword.toLowerCase()];
-          var tooltip = data.percentage + "% of physicians so far said this too";
-          var before = highlightedText.substring(0, rep.start);
-          var after = highlightedText.substring(rep.end);
-          highlightedText = before + '<span class="highlight" data-tooltip="' + tooltip + '">' + rep.word + '</span>' + after;
-        });
-      }
-
-      if (inputEl.innerHTML !== highlightedText) {
-        inputEl.innerHTML = highlightedText;
-        restoreCursorPosition(inputEl, cursorPos);
-      }
-
-      if (hasMatches) {
-        matchedIndicator.classList.add("visible");
-      } else {
-        matchedIndicator.classList.remove("visible");
-      }
-
-      var wordCount = countWords(text);
-      if (wordCount >= 5) {
-        btn.classList.add("active");
-      } else {
-        btn.classList.remove("active");
-      }
-
+      reps.forEach(function(r){var dom=filtered.some(function(e){return r.start>=e.start&&r.end<=e.end;});if(!dom){filtered=filtered.filter(function(e){return!(e.start>=r.start&&e.end<=r.end);});filtered.push(r);}});
+      if (filtered.length > 0) { hasMatches = true; filtered.sort(function(a,b){return b.start-a.start;}); filtered.forEach(function(r){var d=commonKeywords[r.keyword.toLowerCase()],tip=d.percentage+"% of physicians so far said this too";highlighted=highlighted.substring(0,r.start)+'<span class="highlight" data-tooltip="'+tip+'">'+r.word+'</span>'+highlighted.substring(r.end);}); }
+      if (inputEl.innerHTML !== highlighted) { inputEl.innerHTML = highlighted; restoreCursor(inputEl, cursorPos); }
+      matchedIndicator.classList.toggle("visible", hasMatches);
+      btn.classList.toggle("active", countWords(text) >= 5);
       isProcessing = false;
     }
 
-    var debounceTimer;
-    inputEl.addEventListener("input", function() {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(highlightKeywords, 300);
-    });
+    var debounce;
+    inputEl.addEventListener("input", function() { clearTimeout(debounce); debounce = setTimeout(highlightKeywords, 300); });
 
-    var customSelects = document.querySelectorAll(".custom-select");
-    
-    customSelects.forEach(function(select) {
-      var selectBtn = select.querySelector(".custom-select-btn");
-      var options = select.querySelectorAll(".custom-select-option");
-      
-      selectBtn.addEventListener("click", function(e) {
-        e.stopPropagation();
-        customSelects.forEach(function(s) {
-          if (s !== select) s.classList.remove("open");
-        });
-        select.classList.toggle("open");
-      });
-      
-      options.forEach(function(option) {
-        option.addEventListener("click", function() {
-          var text = option.textContent;
-          
-          selectBtn.textContent = text;
-          selectBtn.classList.remove("placeholder");
-          
-          options.forEach(function(opt) {
-            opt.classList.remove("selected");
-          });
-          option.classList.add("selected");
-          
-          select.classList.remove("open");
-        });
-      });
+    document.querySelectorAll(".custom-select").forEach(function(sel) {
+      var btn = sel.querySelector(".custom-select-btn"), opts = sel.querySelectorAll(".custom-select-option");
+      btn.addEventListener("click", function(e) { e.stopPropagation(); document.querySelectorAll(".custom-select").forEach(function(s){if(s!==sel)s.classList.remove("open");}); sel.classList.toggle("open"); });
+      opts.forEach(function(opt) { opt.addEventListener("click", function() { btn.textContent = opt.textContent; btn.classList.remove("placeholder"); opts.forEach(function(o){o.classList.remove("selected");}); opt.classList.add("selected"); sel.classList.remove("open"); }); });
     });
-    
-    document.addEventListener("click", function() {
-      customSelects.forEach(function(select) {
-        select.classList.remove("open");
-      });
-    });
+    document.addEventListener("click", function() { document.querySelectorAll(".custom-select").forEach(function(s){s.classList.remove("open");}); });
 
     btn.addEventListener("click", function() {
       var text = getTextContent(inputEl);
-      var wordCount = countWords(text);
-      if (wordCount < 5) return;
-
-      // Increment counter on submission
+      if (countWords(text) < 5) return;
       baseCount++;
       counterEl.textContent = baseCount;
-
-      // Display user's confession
-      var userText = getTextContent(inputEl);
-      document.getElementById("userConfessionText").textContent = userText;
-
+      document.getElementById("userConfessionText").textContent = text;
       document.getElementById("preSubmission").classList.add("hidden");
       document.getElementById("postSubmission").classList.add("visible");
-
+      document.getElementById("anonHeader").classList.add("hidden");
+      document.getElementById("merokaHeader").classList.add("visible");
       var feed = document.getElementById("confessionsFeed");
-      
-      for (var i = 0; i < confessions.length; i++) {
-        (function(index) {
-          var c = confessions[index];
-          var card = document.createElement("div");
-          card.className = "confession-card";
-          card.innerHTML = '<p>"' + c.text + '"</p><div class="confession-meta"><span>' + c.specialty + '</span><span>·</span><span>' + c.state + '</span><span>·</span><span>' + c.time + '</span></div>';
-          feed.appendChild(card);
-
-          setTimeout(function() {
-            card.classList.add("visible");
-          }, 200 + (index * 200));
-        })(i);
-      }
-
-      setTimeout(function() {
-        document.getElementById("ctaSection").classList.add("visible");
-      }, 200 + (confessions.length * 200) + 400);
-
-      // Animate checkmark on load
-      setTimeout(function() {
-        document.getElementById("thankYouIcon").classList.add("animate");
-      }, 100);
+      confessions.forEach(function(c,i) { var card = document.createElement("div"); card.className = "confession-card"; card.innerHTML = '<p>"'+c.text+'"</p><div class="confession-meta"><span>'+c.specialty+'</span><span>·</span><span>'+c.state+'</span><span>·</span><span>'+c.time+'</span></div>'; feed.appendChild(card); setTimeout(function(){card.classList.add("visible");}, 200+i*200); });
+      setTimeout(function(){document.getElementById("ctaSection").classList.add("visible");}, 200+confessions.length*200+400);
+      setTimeout(function(){document.getElementById("thankYouIcon").classList.add("animate");}, 100);
     });
 
-    // Interactive checkmark click
-    document.getElementById("thankYouIcon").addEventListener("click", function() {
-      this.classList.add("clicked");
-      setTimeout(function() {
-        document.getElementById("thankYouIcon").classList.remove("clicked");
-      }, 400);
-    });
+    document.getElementById("thankYouIcon").addEventListener("click", function() { this.classList.add("clicked"); var el = this; setTimeout(function(){el.classList.remove("clicked");}, 400); });
   </script>
 </body>
 </html>
