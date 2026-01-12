@@ -46,12 +46,14 @@
 
     .logo-img {
       border-radius: 8px;
+      width: 36px;
+      height: 36px;
     }
 
     .logo-text {
       color: #e8e2d9;
       font-weight: 600;
-      font-size: 24px;
+      font-size: 18px;
       letter-spacing: -0.01em;
     }
 
@@ -72,7 +74,7 @@
       border-color: rgba(232,226,217,0.25);
     }
 
-        /* Live Counter */
+    /* Live Counter */
     .live-counter {
       text-align: center;
       padding: 16px 20px;
@@ -118,7 +120,7 @@
       z-index: 10;
       max-width: 640px;
       margin: 0 auto;
-      padding: 60px 24px 80px;
+      padding: 20px 24px 80px;
     }
 
     .hero {
@@ -457,12 +459,44 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .thank-you-icon:hover {
+      transform: scale(1.1);
+      background: rgba(204,85,0,0.2);
     }
 
     .thank-you-icon svg {
       width: 28px;
       height: 28px;
       color: #cc5500;
+    }
+
+    .thank-you-icon.animate svg {
+      animation: checkDraw 0.6s ease-out forwards;
+    }
+
+    @keyframes checkDraw {
+      0% {
+        stroke-dasharray: 50;
+        stroke-dashoffset: 50;
+      }
+      100% {
+        stroke-dasharray: 50;
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .thank-you-icon.clicked {
+      animation: celebratePop 0.4s ease-out;
+    }
+
+    @keyframes celebratePop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
     }
 
     .thank-you h2 {
@@ -475,6 +509,40 @@
     .thank-you p {
       color: #7a756d;
       font-size: 16px;
+    }
+
+    /* User's Confession Highlight */
+    .user-confession-highlight {
+      background: linear-gradient(135deg, #cc5500 0%, #e86a17 100%);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .user-confession-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 12px;
+    }
+
+    .user-confession-text {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: #fff;
+      font-style: italic;
+    }
+
+    .user-confession-text::before {
+      content: '"';
+    }
+
+    .user-confession-text::after {
+      content: '"';
     }
 
     .confessions-feed {
@@ -609,7 +677,7 @@
 
     @media (max-width: 600px) {
       header { padding: 16px 20px; }
-      main { padding: 40px 20px 60px; }
+      main { padding: 20px 20px 60px; }
       .nav-btn { padding: 8px 14px; font-size: 13px; }
       .social-links { flex-direction: column; }
       .cta-section { padding: 28px 20px; }
@@ -633,7 +701,7 @@
     <a href="https://www.meroka.com/contact" target="_blank" class="nav-btn">Explore partnership</a>
   </header>
 
-   <!-- Live Counter -->
+  <!-- Live Counter -->
   <div class="live-counter">
     <div class="counter-inner">
       <div class="counter-dot"></div>
@@ -683,7 +751,7 @@
           </div>
         </div>
 
-        <div class="custom-select" id="areaSelect">
+        <div class="custom-select" id="stateSelect">
           <button type="button" class="custom-select-btn placeholder">State (optional)</button>
           <div class="custom-select-dropdown">
             <div class="custom-select-option" data-value="AL">Alabama</div>
@@ -750,13 +818,19 @@
 
   <main class="post-submission" id="postSubmission">
     <div class="thank-you">
-      <div class="thank-you-icon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      <div class="thank-you-icon" id="thankYouIcon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" id="checkmarkSvg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" id="checkPath"></path>
         </svg>
       </div>
       <h2>You're not alone.</h2>
       <p>See what other physicians have confessed.</p>
+    </div>
+
+    <!-- User's Confession Highlight -->
+    <div class="user-confession-highlight" id="userConfessionHighlight">
+      <p class="user-confession-label">Your confession</p>
+      <p class="user-confession-text" id="userConfessionText"></p>
     </div>
 
     <div class="confessions-feed" id="confessionsFeed"></div>
@@ -764,7 +838,7 @@
     <div class="cta-section" id="ctaSection">
       <span class="cta-tag">Coming Soon</span>
       <h3>Meroka Collective is under construction.</h3>
-      <p>We're building a community for physicians who refuse to let the system break them.</p>
+      <p>We're building something for physicians who refuse to let the system break them.</p>
       
       <div class="social-links">
         <a href="https://x.com/MerokaInc" target="_blank" class="social-link">
@@ -795,7 +869,7 @@
   </footer>
 
   <script>
-    // Live counter animation --> EVENTUALLY CONNECT IT TO CONFESSION BEING INPUTTED 
+    // Live counter animation
     var counterEl = document.getElementById("confessionCount");
     var baseCount = 847;
     
@@ -849,7 +923,6 @@
       "prior auth": { count: 423, percentage: 85 },
       "denied": { count: 645, percentage: 86 },
       "reimbursement": { count: 534, percentage: 82 },
-      "reimbusements": { count: 312, percentage: 79 },
       "underpaid": { count: 234, percentage: 74 },
       "billing": { count: 445, percentage: 77 },
       "coding": { count: 312, percentage: 71 },
@@ -862,6 +935,7 @@
       "staff": { count: 456, percentage: 78 },
       "turnover": { count: 345, percentage: 75 },
       "hiring": { count: 289, percentage: 72 },
+      "admin": { count: 10000, percentage: 100 }, 
       "understaffed": { count: 234, percentage: 73 },
       "payroll": { count: 198, percentage: 68 },
       "overhead": { count: 267, percentage: 71 },
@@ -889,12 +963,12 @@
     };
 
     var confessions = [
-      { text: "I spent 3 hours on prior authorizations yesterday instead of seeing patients. This isn't why I became a doctor.", time: "2 hours ago", specialty: "Family Medicine" },
-      { text: "Insurance denied a life-saving medication for my patient. Again. I'm exhausted fighting battles that shouldn't exist.", time: "5 hours ago", specialty: "Oncology" },
-      { text: "My staff turnover is killing me. I can't compete with hospital salaries and I'm drowning.", time: "8 hours ago", specialty: "Internal Medicine" },
-      { text: "I love being independent but I feel completely alone. No one to strategize with, no one who gets it.", time: "12 hours ago", specialty: "Pediatrics" },
-      { text: "Reimbursements keep shrinking while my costs keep rising. How much longer can I keep the lights on?", time: "1 day ago", specialty: "Cardiology" },
-      { text: "I went into medicine to heal people, not to become a full-time administrator who occasionally practices medicine.", time: "1 day ago", specialty: "Dermatology" },
+      { text: "I spent 3 hours on prior authorizations yesterday instead of seeing patients. This isn't why I became a doctor.", time: "2 hours ago", specialty: "Family Medicine", state: "California" },
+      { text: "Insurance denied a life-saving medication for my patient. Again. I'm exhausted fighting battles that shouldn't exist.", time: "5 hours ago", specialty: "Oncology", state: "New York" },
+      { text: "My staff turnover is killing me. I can't compete with hospital salaries and I'm drowning.", time: "8 hours ago", specialty: "Internal Medicine", state: "Texas" },
+      { text: "I love being independent but I feel completely alone. No one to strategize with, no one who gets it.", time: "12 hours ago", specialty: "Pediatrics", state: "Florida" },
+      { text: "Reimbursements keep shrinking while my costs keep rising. How much longer can I keep the lights on?", time: "1 day ago", specialty: "Cardiology", state: "Illinois" },
+      { text: "I went into medicine to heal people, not to become a full-time administrator who occasionally practices medicine.", time: "1 day ago", specialty: "Dermatology", state: "Pennsylvania" },
     ];
 
     var inputEl = document.getElementById("confessionInput");
@@ -1081,6 +1155,14 @@
       var wordCount = countWords(text);
       if (wordCount < 5) return;
 
+      // Increment counter on submission
+      baseCount++;
+      counterEl.textContent = baseCount;
+
+      // Display user's confession
+      var userText = getTextContent(inputEl);
+      document.getElementById("userConfessionText").textContent = userText;
+
       document.getElementById("preSubmission").classList.add("hidden");
       document.getElementById("postSubmission").classList.add("visible");
 
@@ -1091,7 +1173,7 @@
           var c = confessions[index];
           var card = document.createElement("div");
           card.className = "confession-card";
-          card.innerHTML = '<p>"' + c.text + '"</p><div class="confession-meta"><span>' + c.specialty + '</span><span>·</span><span>' + c.time + '</span></div>';
+          card.innerHTML = '<p>"' + c.text + '"</p><div class="confession-meta"><span>' + c.specialty + '</span><span>·</span><span>' + c.state + '</span><span>·</span><span>' + c.time + '</span></div>';
           feed.appendChild(card);
 
           setTimeout(function() {
@@ -1103,6 +1185,19 @@
       setTimeout(function() {
         document.getElementById("ctaSection").classList.add("visible");
       }, 200 + (confessions.length * 200) + 400);
+
+      // Animate checkmark on load
+      setTimeout(function() {
+        document.getElementById("thankYouIcon").classList.add("animate");
+      }, 100);
+    });
+
+    // Interactive checkmark click
+    document.getElementById("thankYouIcon").addEventListener("click", function() {
+      this.classList.add("clicked");
+      setTimeout(function() {
+        document.getElementById("thankYouIcon").classList.remove("clicked");
+      }, 400);
     });
   </script>
 </body>
