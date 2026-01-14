@@ -11,7 +11,6 @@
     .ambient-glow { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 800px; height: 400px; background: radial-gradient(ellipse, rgba(155,66,15,0.12) 0%, transparent 70%); pointer-events: none; }
     header { position: relative; z-index: 10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
     .logo { display: flex; align-items: center; gap: 12px; }
-    .logo-img { border-radius: 8px; width: 36px; height: 36px; }
     .logo-text { color: #F7F5F2; font-weight: 600; font-size: 18px; letter-spacing: -0.01em; }
     .nav-btn { background: #9b420f; color: #FFFFFF; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; transition: all 0.2s ease; border: none; }
     .nav-btn:hover { background: #b84e12; transform: translateY(-1px); }
@@ -52,7 +51,6 @@
     .custom-select-dropdown::-webkit-scrollbar { width: 6px; }
     .custom-select-dropdown::-webkit-scrollbar-track { background: transparent; }
     .custom-select-dropdown::-webkit-scrollbar-thumb { background: rgba(24,33,45,0.2); border-radius: 3px; }
-    .custom-select-dropdown::-webkit-scrollbar-thumb:hover { background: rgba(24,33,45,0.35); }
     .custom-select.open .custom-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
     .custom-select-option { padding: 10px 12px; font-size: 13px; font-weight: 500; color: #18212d; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
     .custom-select-option:hover { background: rgba(155,66,15,0.1); color: #9b420f; }
@@ -93,7 +91,7 @@
     .social-link:hover { background: #9b420f; border-color: #9b420f; }
     .social-link svg { width: 16px; height: 16px; }
     .pre-submission.hidden { display: none; }
-    footer { text-align: center; padding: 24px; color: #a09a91; font-size: 13px; border-top: 1px solid rgba(247,245,242,0.1); }
+    footer { text-align: center; padding: 24px; padding-bottom: 70px; color: #a09a91; font-size: 13px; border-top: 1px solid rgba(247,245,242,0.1); }
     footer a { color: #a09a91; text-decoration: none; transition: color 0.2s ease; }
     footer a:hover { color: #9b420f; }
     .anon-header { display: flex; }
@@ -103,6 +101,12 @@
     .anon-logo-icon { width: 36px; height: 36px; background: #9b420f; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
     .anon-logo-icon svg { width: 20px; height: 20px; color: #FFFFFF; }
     .anon-tag { font-size: 13px; color: #a09a91; }
+    .auto-close-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #18212d; border-top: 1px solid rgba(155,66,15,0.3); padding: 12px 20px; display: none; align-items: center; justify-content: center; gap: 12px; z-index: 100; }
+    .auto-close-banner.visible { display: flex; }
+    .auto-close-text { font-size: 13px; color: #a09a91; }
+    .auto-close-time { font-family: 'Geist Mono', monospace; font-weight: 600; color: #9b420f; }
+    .auto-close-btn { background: transparent; border: 1px solid rgba(247,245,242,0.2); color: #F7F5F2; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: none; }
+    .auto-close-btn:hover { background: rgba(247,245,242,0.1); border-color: rgba(247,245,242,0.3); }
     @media (max-width: 600px) { header { padding: 16px 20px; } main { padding: 20px 20px 60px; } .nav-btn { padding: 8px 14px; font-size: 13px; } .social-links { flex-direction: column; } .cta-section { padding: 28px 20px; } .rotating-word { min-width: 140px; } }
   </style>
 </head>
@@ -220,6 +224,10 @@
     </div>
   </main>
 
+  <div class="auto-close-banner" id="autoCloseBanner">
+    <span class="auto-close-text">Redirecting to Meroka in <span class="auto-close-time" id="countdownTimer">5:00</span></span>
+  </div>
+
   <footer id="footer">
     <p>© 2026 Meroka Inc. All rights reserved.</p>
     <p style="margin-top: 6px;"><a href="https://www.meroka.com/privacy" target="_blank">Privacy</a> · <a href="https://www.meroka.com/terms" target="_blank">Terms</a></p>
@@ -300,6 +308,28 @@
     });
     document.addEventListener("click", function() { document.querySelectorAll(".custom-select").forEach(function(s){s.classList.remove("open");}); });
 
+    // Auto-close functionality
+    var countdownInterval = null;
+    var remainingSeconds = 300;
+
+    function startAutoClose() {
+      var banner = document.getElementById("autoCloseBanner");
+      var timerEl = document.getElementById("countdownTimer");
+      banner.classList.add("visible");
+      
+      countdownInterval = setInterval(function() {
+        remainingSeconds--;
+        var mins = Math.floor(remainingSeconds / 60);
+        var secs = remainingSeconds % 60;
+        timerEl.textContent = mins + ":" + (secs < 10 ? "0" : "") + secs;
+        
+        if (remainingSeconds <= 0) {
+          clearInterval(countdownInterval);
+          window.location.href = "https://www.meroka.com";
+        }
+      }, 1000);
+    }
+
     btn.addEventListener("click", function() {
       var text = getTextContent(inputEl);
       if (countWords(text) < 5) return;
@@ -314,6 +344,7 @@
       confessions.forEach(function(c,i) { var card = document.createElement("div"); card.className = "confession-card"; card.innerHTML = '<p>"'+c.text+'"</p><div class="confession-meta"><span>'+c.specialty+'</span><span>·</span><span>'+c.state+'</span><span>·</span><span>'+c.time+'</span></div>'; feed.appendChild(card); setTimeout(function(){card.classList.add("visible");}, 200+i*200); });
       setTimeout(function(){document.getElementById("ctaSection").classList.add("visible");}, 200+confessions.length*200+400);
       setTimeout(function(){document.getElementById("thankYouIcon").classList.add("animate");}, 100);
+      startAutoClose();
     });
 
     document.getElementById("thankYouIcon").addEventListener("click", function() { this.classList.add("clicked"); var el = this; setTimeout(function(){el.classList.remove("clicked");}, 400); });
