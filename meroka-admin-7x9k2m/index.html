@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - Physician Confessional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f1419; color: #e8e2d9; min-height: 100vh; }
+    
+    /* Login Page */
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; }
+    .login-box h1 { font-size: 24px; margin-bottom: 8px; }
+    .login-box p { color: #7a756d; font-size: 14px; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #a09a92; }
+    .form-group input { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #e8e2d9; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-group input:focus { border-color: #cc5500; }
+    .login-btn { width: 100%; padding: 14px; background: #cc5500; border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .login-btn:hover { background: #e05f00; }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error-msg { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #f87171; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .error-msg.visible { display: block; }
+
+    /* Dashboard */
+    .dashboard { display: none; }
+    .dashboard.visible { display: block; }
+    .login-container.hidden { display: none; }
+    
+    header { padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+    .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #cc5500, #e86a17); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 18px; height: 18px; color: #fff; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .admin-email { font-size: 13px; color: #7a756d; }
+    .logout-btn { padding: 8px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e8e2d9; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .logout-btn:hover { background: rgba(220,38,38,0.2); border-color: rgba(220,38,38,0.4); }
+
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; }
+    .stat-card .label { font-size: 12px; color: #7a756d; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .stat-card .value { font-size: 32px; font-weight: 700; color: #cc5500; }
+    .stat-card .subtext { font-size: 12px; color: #5a554d; margin-top: 4px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px; }
+    .tab { padding: 10px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: #7a756d; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .tab:hover { background: rgba(255,255,255,0.03); }
+    .tab.active { background: #cc5500; border-color: #cc5500; color: #fff; }
+
+    /* Confessions List */
+    .confessions-list { display: flex; flex-direction: column; gap: 12px; }
+    .confession-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+    .confession-item:hover { border-color: rgba(255,255,255,0.1); }
+    .confession-item.flagged { border-color: rgba(234,179,8,0.3); background: rgba(234,179,8,0.05); }
+    .confession-item.hidden { opacity: 0.5; border-color: rgba(220,38,38,0.3); }
+    .confession-text { font-size: 15px; line-height: 1.6; color: #c4bfb6; margin-bottom: 12px; }
+    .confession-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: #5a554d; margin-bottom: 12px; }
+    .confession-meta span { display: flex; align-items: center; gap: 4px; }
+    .confession-actions { display: flex; gap: 8px; }
+    .action-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid; }
+    .action-btn.flag { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: #fbbf24; }
+    .action-btn.flag:hover { background: rgba(234,179,8,0.2); }
+    .action-btn.flag.active { background: #fbbf24; color: #000; }
+    .action-btn.hide { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
+    .action-btn.hide:hover { background: rgba(220,38,38,0.2); }
+    .action-btn.hide.active { background: #dc2626; color: #fff; }
+    .action-btn.delete { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
+    .action-btn.delete:hover { background: #dc2626; color: #fff; }
+
+    /* Charts Section */
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .chart-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; }
+    .chart-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    .chart-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .chart-bar .label { width: 120px; font-size: 12px; color: #a09a92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chart-bar .bar-container { flex: 1; height: 24px; background: rgba(255,255,255,0.03); border-radius: 4px; overflow: hidden; }
+    .chart-bar .bar { height: 100%; background: linear-gradient(90deg, #cc5500, #e86a17); border-radius: 4px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+    .chart-bar .bar span { font-size: 11px; font-weight: 600; color: #fff; }
+
+    .loading { text-align: center; padding: 40px; color: #7a756d; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #5a554d; }
+    .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: #7a756d; }
+
+    .tab-content { display: none; }
+    .tab-content.visible { display: block; }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .header-right { flex-direction: column; align-items: flex-end; gap: 8px; }
+      .confession-actions { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Page -->
+  <div class="login-container" id="loginContainer">
+    <div class="login-box">
+      <h1>Admin Portal</h1>
+      <p>Sign in to manage the Physician Confessional</p>
+      <div class="error-msg" id="errorMsg"></div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="emailInput" placeholder="admin@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="••••••••">
+      </div>
+      <button class="login-btn" id="loginBtn">Sign In</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </div>
+        <span>Admin Portal</span>
+      </div>
+      <div class="header-right">
+        <span class="admin-email" id="adminEmail"></span>
+        <button class="logout-btn" id="logoutBtn">Sign Out</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="label">Total Confessions</div>
+          <div class="value" id="statTotal">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Today</div>
+          <div class="value" id="statToday">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">This Week</div>
+          <div class="value" id="statWeek">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Flagged</div>
+          <div class="value" id="statFlagged">-</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="confessions">All Confessions</button>
+        <button class="tab" data-tab="flagged">Flagged</button>
+        <button class="tab" data-tab="analytics">Analytics</button>
+      </div>
+
+      <!-- Tab Content: Confessions -->
+      <div class="tab-content visible" id="confessionsTab">
+        <div class="confessions-list" id="confessionsList">
+          <div class="loading">Loading confessions...</div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Flagged -->
+      <div class="tab-content" id="flaggedTab">
+        <div class="confessions-list" id="flaggedList">
+          <div class="loading">Loading flagged confessions...</div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Analytics -->
+      <div class="tab-content" id="analyticsTab">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>By Specialty</h3>
+            <div id="specialtyChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>By State</h3>
+            <div id="stateChart"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Top Keywords</h3>
+            <div id="keywordChart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============= SUPABASE CONFIG =============
+    const SUPABASE_URL = 'https://hjomlxpovxgjweauiewt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb21seHBvdnhnandlYXVpZXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODQzMDUsImV4cCI6MjA4NDE2MDMwNX0.UcevzUHjnhikSQsHUuK4sfWM7ZFjVJ-X9pdaokUYmxo';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ============= DOM ELEMENTS =============
+    const loginContainer = document.getElementById('loginContainer');
+    const dashboard = document.getElementById('dashboard');
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const adminEmail = document.getElementById('adminEmail');
+
+    // ============= AUTH FUNCTIONS =============
+    async function signIn() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showError('Please enter email and password');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) throw error;
+
+        // Check if user is admin
+        const { data: adminData, error: adminError } = await supabaseClient
+          .from('admins')
+          .select('email')
+          .eq('email', email)
+          .single();
+
+        if (adminError || !adminData) {
+          await supabaseClient.auth.signOut();
+          throw new Error('You are not authorized as an admin');
+        }
+
+        showDashboard(email);
+      } catch (error) {
+        showError(error.message);
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+      }
+    }
+
+    async function signOut() {
+      await supabaseClient.auth.signOut();
+      dashboard.classList.remove('visible');
+      loginContainer.classList.remove('hidden');
+      emailInput.value = '';
+      passwordInput.value = '';
+    }
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.add('visible');
+      setTimeout(() => errorMsg.classList.remove('visible'), 5000);
+    }
+
+    async function checkSession() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        const { data: adminData } = await supabaseClient
+          .from('admins')
+          .select('email')
+          .eq('email', session.user.email)
+          .single();
+
+        if (adminData) {
+          showDashboard(session.user.email);
+        }
+      }
+    }
+
+    function showDashboard(email) {
+      loginContainer.classList.add('hidden');
+      dashboard.classList.add('visible');
+      adminEmail.textContent = email;
+      loadStats();
+      loadConfessions();
+    }
+
+    // ============= DATA FUNCTIONS =============
+    async function loadStats() {
+      try {
+        const { data, error } = await supabaseClient.from('admin_stats').select('*').single();
+        if (error) throw error;
+
+        document.getElementById('statTotal').textContent = data.total_confessions || 0;
+        document.getElementById('statToday').textContent = data.confessions_today || 0;
+        document.getElementById('statWeek').textContent = data.confessions_this_week || 0;
+        document.getElementById('statFlagged').textContent = data.flagged_count || 0;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    async function loadConfessions(flaggedOnly = false) {
+      const listId = flaggedOnly ? 'flaggedList' : 'confessionsList';
+      const list = document.getElementById(listId);
+      list.innerHTML = '<div class="loading">Loading...</div>';
+
+      try {
+        let query = supabaseClient.from('confessions').select('*').order('created_at', { ascending: false });
+        if (flaggedOnly) query = query.eq('is_flagged', true);
+
+        const { data, error } = await query.limit(50);
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          list.innerHTML = `<div class="empty-state"><h3>No confessions${flaggedOnly ? ' flagged' : ''}</h3><p>${flaggedOnly ? 'Nothing has been flagged yet' : 'Confessions will appear here'}</p></div>`;
+          return;
+        }
+
+        list.innerHTML = data.map(c => `
+          <div class="confession-item ${c.is_flagged ? 'flagged' : ''} ${c.is_hidden ? 'hidden' : ''}" data-id="${c.id}">
+            <div class="confession-text">"${escapeHtml(c.confession_text)}"</div>
+            <div class="confession-meta">
+              <span>${c.specialty || 'No specialty'}</span>
+              <span>${c.state || 'No state'}</span>
+              <span>${c.years_independent || 'N/A'}</span>
+              <span>${formatDate(c.created_at)}</span>
+            </div>
+            <div class="confession-actions">
+              <button class="action-btn flag ${c.is_flagged ? 'active' : ''}" onclick="toggleFlag('${c.id}', ${!c.is_flagged})">${c.is_flagged ? 'Unflag' : 'Flag'}</button>
+              <button class="action-btn hide ${c.is_hidden ? 'active' : ''}" onclick="toggleHide('${c.id}', ${!c.is_hidden})">${c.is_hidden ? 'Unhide' : 'Hide'}</button>
+              <button class="action-btn delete" onclick="deleteConfession('${c.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading confessions:', error);
+        list.innerHTML = '<div class="empty-state"><h3>Error loading</h3><p>' + error.message + '</p></div>';
+      }
+    }
+
+    async function loadAnalytics() {
+      // Specialty chart
+      try {
+        const { data: specialtyData } = await supabaseClient.from('confessions_by_specialty').select('*').limit(8);
+        const maxSpecialty = Math.max(...(specialtyData || []).map(d => d.count));
+        document.getElementById('specialtyChart').innerHTML = (specialtyData || []).map(d => `
+          <div class="chart-bar">
+            <div class="label">${d.specialty}</div>
+            <div class="bar-container"><div class="bar" style="width: ${(d.count / maxSpecialty) * 100}%"><span>${d.count}</span></div></div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+
+      // State chart
+      try {
+        const { data: stateData } = await supabaseClient.from('confessions_by_state').select('*').limit(8);
+        const maxState = Math.max(...(stateData || []).map(d => d.count));
+        document.getElementById('stateChart').innerHTML = (stateData || []).map(d => `
+          <div class="chart-bar">
+            <div class="label">${d.state}</div>
+            <div class="bar-container"><div class="bar" style="width: ${(d.count / maxState) * 100}%"><span>${d.count}</span></div></div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+
+      // Keyword chart
+      try {
+        const { data: keywordData } = await supabaseClient.from('keyword_stats').select('*').limit(10);
+        const maxKeyword = Math.max(...(keywordData || []).map(d => d.total_count));
+        document.getElementById('keywordChart').innerHTML = (keywordData || []).map(d => `
+          <div class="chart-bar">
+            <div class="label">${d.keyword}</div>
+            <div class="bar-container"><div class="bar" style="width: ${(d.total_count / maxKeyword) * 100}%"><span>${d.total_count} (${d.percentage}%)</span></div></div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    // ============= ACTIONS =============
+    async function toggleFlag(id, flagged) {
+      try {
+        const { error } = await supabaseClient.from('confessions').update({ is_flagged: flagged, flagged_at: flagged ? new Date().toISOString() : null }).eq('id', id);
+        if (error) throw error;
+        loadConfessions();
+        loadConfessions(true);
+        loadStats();
+      } catch (error) { alert('Error: ' + error.message); }
+    }
+
+    async function toggleHide(id, hidden) {
+      try {
+        const { error } = await supabaseClient.from('confessions').update({ is_hidden: hidden }).eq('id', id);
+        if (error) throw error;
+        loadConfessions();
+        loadConfessions(true);
+        loadStats();
+      } catch (error) { alert('Error: ' + error.message); }
+    }
+
+    async function deleteConfession(id) {
+      if (!confirm('Are you sure you want to permanently delete this confession?')) return;
+      try {
+        const { error } = await supabaseClient.from('confessions').delete().eq('id', id);
+        if (error) throw error;
+        loadConfessions();
+        loadConfessions(true);
+        loadStats();
+      } catch (error) { alert('Error: ' + error.message); }
+    }
+
+    // ============= HELPERS =============
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ============= TABS =============
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('visible'));
+        tab.classList.add('active');
+        const tabId = tab.dataset.tab + 'Tab';
+        document.getElementById(tabId).classList.add('visible');
+
+        if (tab.dataset.tab === 'flagged') loadConfessions(true);
+        if (tab.dataset.tab === 'analytics') loadAnalytics();
+      });
+    });
+
+    // ============= EVENT LISTENERS =============
+    loginBtn.addEventListener('click', signIn);
+    logoutBtn.addEventListener('click', signOut);
+    passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') signIn(); });
+
+    // Check for existing session on load
+    checkSession();
+  </script>
+</body>
+</html>
