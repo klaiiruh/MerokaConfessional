@@ -226,7 +226,7 @@
     const SUPABASE_URL = 'https://hjomlxpovxgjweauiewt.supabase.co'; 
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb21seHBvdnhnandlYXVpZXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODQzMDUsImV4cCI6MjA4NDE2MDMwNX0.UcevzUHjnhikSQsHUuK4sfWM7ZFjVJ-X9pdaokUYmxo'; 
     // Initialize Supabase client
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ============= TRACKED KEYWORDS =============
     const TRACKED_KEYWORDS = [
@@ -251,7 +251,7 @@
     // ============= SUPABASE API FUNCTIONS =============
     async function fetchConfessionCount() {
       try {
-        const { count, error } = await supabase
+        const { count, error } = await supabaseClient
           .from('confessions')
           .select('*', { count: 'exact', head: true });
         
@@ -265,7 +265,7 @@
 
     async function fetchKeywordStats() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('keyword_stats')
           .select('*');
         
@@ -293,7 +293,7 @@
         const wordCount = countWords(confessionText);
 
         // Insert confession
-        const { data: confession, error: confessionError } = await supabase
+        const { data: confession, error: confessionError } = await supabaseClient
           .from('confessions')
           .insert({
             confession_text: confessionText,
@@ -314,7 +314,7 @@
             keyword: keyword.toLowerCase()
           }));
 
-          const { error: keywordError } = await supabase
+          const { error: keywordError } = await supabaseClient
             .from('keyword_matches')
             .insert(keywordInserts);
 
@@ -330,7 +330,7 @@
 
     async function fetchRecentConfessions(limit = 6) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('confessions')
           .select('*')
           .order('created_at', { ascending: false })
@@ -383,7 +383,7 @@
     // ============= INITIALIZATION =============
     document.addEventListener('DOMContentLoaded', async function() {
       // Check if Supabase is configured
-      if (SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+      if (SUPABASE_URL.includes('YOUR_PROJECT_URL') || SUPABASE_ANON_KEY.includes('YOUR_ANON_KEY')) {
         console.error('⚠️ Please configure your Supabase credentials in the JavaScript!');
         document.getElementById('confessionCount').textContent = 'Config needed';
         return;
