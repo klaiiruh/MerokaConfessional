@@ -11,7 +11,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #18212d; color: #F7F5F2; min-height: 100vh; }
     
-    /* Login Page */
     .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .login-box { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; }
     .login-box h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; letter-spacing: -0.02em; }
@@ -27,7 +26,6 @@
     .error-msg { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #f87171; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
     .error-msg.visible { display: block; }
 
-    /* Dashboard */
     .dashboard { display: none; }
     .dashboard.visible { display: block; }
     .login-container.hidden { display: none; }
@@ -43,29 +41,26 @@
 
     .main-content { max-width: 1200px; margin: 0 auto; padding: 24px; }
     
-    /* Stats Grid */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
     .stat-card { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; }
     .stat-card .label { font-size: 12px; color: #a8a29e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
     .stat-card .value { font-size: 32px; font-weight: 700; color: #9b420f; }
     .stat-card .subtext { font-size: 12px; color: #6b7280; margin-top: 4px; }
 
-    /* Tabs */
     .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(247,245,242,0.08); padding-bottom: 16px; }
     .tab { padding: 10px 16px; background: transparent; border: 1px solid rgba(247,245,242,0.1); border-radius: 8px; color: #a8a29e; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; }
     .tab:hover { background: rgba(247,245,242,0.05); }
     .tab.active { background: #9b420f; border-color: #9b420f; color: #fff; }
 
-    /* Confessions List */
     .confessions-list { display: flex; flex-direction: column; gap: 12px; }
     .confession-item { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; transition: all 0.2s; }
     .confession-item:hover { border-color: rgba(247,245,242,0.15); }
     .confession-item.flagged { border-color: rgba(234,179,8,0.3); background: rgba(234,179,8,0.05); }
-    .confession-item.hidden { opacity: 0.5; border-color: rgba(220,38,38,0.3); }
+    .confession-item.is-hidden { opacity: 0.5; border-color: rgba(220,38,38,0.3); }
     .confession-text { font-size: 15px; line-height: 1.6; color: #d1ccc4; margin-bottom: 12px; }
     .confession-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: #6b7280; margin-bottom: 12px; }
     .confession-meta span { display: flex; align-items: center; gap: 4px; }
-    .confession-actions { display: flex; gap: 8px; }
+    .confession-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .action-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; border: 1px solid; }
     .action-btn.flag { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: #fbbf24; }
     .action-btn.flag:hover { background: rgba(234,179,8,0.2); }
@@ -75,8 +70,8 @@
     .action-btn.hide.active { background: #dc2626; color: #fff; }
     .action-btn.delete { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
     .action-btn.delete:hover { background: #dc2626; color: #fff; }
+    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Charts Section */
     .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
     .chart-card { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; }
     .chart-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
@@ -92,11 +87,14 @@
 
     .tab-content { display: none; }
     .tab-content.visible { display: block; }
+    
+    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    .status-badge.hidden-badge { background: rgba(220,38,38,0.2); color: #f87171; }
+    .status-badge.flagged-badge { background: rgba(234,179,8,0.2); color: #fbbf24; }
 
-    /* Scrollbar Styling */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: rgba(247,245,242,0.05); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb { background: rgba(155,66,15,0.5); border-radius: 3px; transition: background 0.2s ease; }
+    ::-webkit-scrollbar-thumb { background: rgba(155,66,15,0.5); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(155,66,15,0.8); }
 
     @media (max-width: 600px) {
@@ -108,7 +106,6 @@
 </head>
 <body>
 
-  <!-- Login Page -->
   <div class="login-container" id="loginContainer">
     <div class="login-box">
       <h1>Meroka Admin Portal</h1>
@@ -126,7 +123,6 @@
     </div>
   </div>
 
-  <!-- Dashboard -->
   <div class="dashboard" id="dashboard">
     <header>
       <div class="logo">
@@ -142,7 +138,6 @@
     </header>
 
     <div class="main-content">
-      <!-- Stats -->
       <div class="stats-grid" id="statsGrid">
         <div class="stat-card">
           <div class="label">Total Confessions</div>
@@ -162,28 +157,25 @@
         </div>
       </div>
 
-      <!-- Tabs -->
       <div class="tabs">
         <button class="tab active" data-tab="confessions">All Confessions</button>
         <button class="tab" data-tab="flagged">Flagged</button>
+        <button class="tab" data-tab="hidden">Hidden</button>
         <button class="tab" data-tab="analytics">Analytics</button>
       </div>
 
-      <!-- Tab Content: Confessions -->
       <div class="tab-content visible" id="confessionsTab">
-        <div class="confessions-list" id="confessionsList">
-          <div class="loading">Loading confessions...</div>
-        </div>
+        <div class="confessions-list" id="confessionsList"></div>
       </div>
 
-      <!-- Tab Content: Flagged -->
       <div class="tab-content" id="flaggedTab">
-        <div class="confessions-list" id="flaggedList">
-          <div class="loading">Loading flagged confessions...</div>
-        </div>
+        <div class="confessions-list" id="flaggedList"></div>
       </div>
 
-      <!-- Tab Content: Analytics -->
+      <div class="tab-content" id="hiddenTab">
+        <div class="confessions-list" id="hiddenList"></div>
+      </div>
+
       <div class="tab-content" id="analyticsTab">
         <div class="charts-grid">
           <div class="chart-card">
@@ -217,6 +209,7 @@
     const errorMsg = document.getElementById('errorMsg');
     const adminEmail = document.getElementById('adminEmail');
 
+    // ============= AUTH =============
     async function signIn() {
       const email = emailInput.value.trim();
       const password = passwordInput.value;
@@ -226,8 +219,12 @@
       try {
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        
         const { data: adminData, error: adminError } = await supabaseClient.from('admins').select('email').eq('email', email).single();
-        if (adminError || !adminData) { await supabaseClient.auth.signOut(); throw new Error('You are not authorized as an admin'); }
+        if (adminError || !adminData) { 
+          await supabaseClient.auth.signOut(); 
+          throw new Error('You are not authorized as an admin'); 
+        }
         showDashboard(email);
       } catch (error) {
         showError(error.message);
@@ -263,9 +260,10 @@
       dashboard.classList.add('visible');
       adminEmail.textContent = email;
       loadStats();
-      loadConfessions();
+      loadConfessions('all');
     }
 
+    // ============= DATA LOADING =============
     async function loadStats() {
       try {
         const { data, error } = await supabaseClient.from('admin_stats').select('*').single();
@@ -277,107 +275,258 @@
       } catch (error) { console.error('Error loading stats:', error); }
     }
 
-    async function loadConfessions(flaggedOnly = false) {
-      const listId = flaggedOnly ? 'flaggedList' : 'confessionsList';
-      const list = document.getElementById(listId);
+    async function loadConfessions(filter = 'all') {
+      const listMap = { all: 'confessionsList', flagged: 'flaggedList', hidden: 'hiddenList' };
+      const list = document.getElementById(listMap[filter]);
+      if (!list) return;
+      
       list.innerHTML = '<div class="loading">Loading...</div>';
+      
       try {
         let query = supabaseClient.from('confessions').select('*').order('created_at', { ascending: false });
-        if (flaggedOnly) query = query.eq('is_flagged', true);
-        const { data, error } = await query.limit(50);
+        
+        if (filter === 'flagged') query = query.eq('is_flagged', true);
+        if (filter === 'hidden') query = query.eq('is_hidden', true);
+        
+        const { data, error } = await query.limit(100);
         if (error) throw error;
+        
         if (!data || data.length === 0) {
-          list.innerHTML = `<div class="empty-state"><h3>No confessions${flaggedOnly ? ' flagged' : ''}</h3><p>${flaggedOnly ? 'Nothing has been flagged yet' : 'Confessions will appear here'}</p></div>`;
+          const messages = {
+            all: { title: 'No confessions yet', desc: 'Confessions will appear here' },
+            flagged: { title: 'No flagged confessions', desc: 'Nothing has been flagged yet' },
+            hidden: { title: 'No hidden confessions', desc: 'Nothing has been hidden yet' }
+          };
+          list.innerHTML = `<div class="empty-state"><h3>${messages[filter].title}</h3><p>${messages[filter].desc}</p></div>`;
           return;
         }
-        list.innerHTML = data.map(c => `
-          <div class="confession-item ${c.is_flagged ? 'flagged' : ''} ${c.is_hidden ? 'hidden' : ''}" data-id="${c.id}">
-            <div class="confession-text">"${escapeHtml(c.confession_text)}"</div>
-            <div class="confession-meta">
-              <span>${c.specialty || 'No specialty'}</span>
-              <span>${c.state || 'No state'}</span>
-              <span>${c.years_independent || 'N/A'}</span>
-              <span>${formatDate(c.created_at)}</span>
-            </div>
-            <div class="confession-actions">
-              <button class="action-btn flag ${c.is_flagged ? 'active' : ''}" onclick="toggleFlag('${c.id}', ${!c.is_flagged})">${c.is_flagged ? 'Unflag' : 'Flag'}</button>
-              <button class="action-btn hide ${c.is_hidden ? 'active' : ''}" onclick="toggleHide('${c.id}', ${!c.is_hidden})">${c.is_hidden ? 'Unhide' : 'Hide'}</button>
-              <button class="action-btn delete" onclick="deleteConfession('${c.id}')">Delete</button>
-            </div>
-          </div>
-        `).join('');
+        
+        list.innerHTML = data.map(c => renderConfessionCard(c)).join('');
+        
+        // Attach event listeners
+        list.querySelectorAll('.action-btn').forEach(btn => {
+          btn.addEventListener('click', handleAction);
+        });
+        
       } catch (error) {
         console.error('Error loading confessions:', error);
-        list.innerHTML = '<div class="empty-state"><h3>Error loading</h3><p>' + error.message + '</p></div>';
+        list.innerHTML = `<div class="empty-state"><h3>Error loading</h3><p>${error.message}</p></div>`;
       }
     }
 
-    async function loadAnalytics() {
+    function renderConfessionCard(c) {
+      const hiddenClass = c.is_hidden ? 'is-hidden' : '';
+      const flaggedClass = c.is_flagged ? 'flagged' : '';
+      
+      let badges = '';
+      if (c.is_hidden) badges += '<span class="status-badge hidden-badge">HIDDEN</span>';
+      if (c.is_flagged) badges += '<span class="status-badge flagged-badge">FLAGGED</span>';
+      
+      return `
+        <div class="confession-item ${flaggedClass} ${hiddenClass}" data-id="${c.id}">
+          <div class="confession-text">"${escapeHtml(c.confession_text)}"${badges}</div>
+          <div class="confession-meta">
+            <span>${c.specialty || 'No specialty'}</span>
+            <span>•</span>
+            <span>${c.state || 'No state'}</span>
+            <span>•</span>
+            <span>${c.years_independent || 'N/A'}</span>
+            <span>•</span>
+            <span>${formatDate(c.created_at)}</span>
+          </div>
+          <div class="confession-actions">
+            <button class="action-btn flag ${c.is_flagged ? 'active' : ''}" data-action="flag" data-id="${c.id}" data-current="${c.is_flagged}">
+              ${c.is_flagged ? 'Unflag' : 'Flag'}
+            </button>
+            <button class="action-btn hide ${c.is_hidden ? 'active' : ''}" data-action="hide" data-id="${c.id}" data-current="${c.is_hidden}">
+              ${c.is_hidden ? 'Unhide' : 'Hide'}
+            </button>
+            <button class="action-btn delete" data-action="delete" data-id="${c.id}">
+              Delete
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============= ACTIONS =============
+    async function handleAction(e) {
+      const btn = e.target;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      const current = btn.dataset.current === 'true';
+      
+      btn.disabled = true;
+      
       try {
-        const { data: specialtyData } = await supabaseClient.from('confessions_by_specialty').select('*').limit(8);
-        const maxSpecialty = Math.max(...(specialtyData || []).map(d => d.count));
-        document.getElementById('specialtyChart').innerHTML = (specialtyData || []).map(d => `
-          <div class="chart-bar"><div class="label">${d.specialty}</div><div class="bar-container"><div class="bar" style="width: ${(d.count / maxSpecialty) * 100}%"><span>${d.count}</span></div></div></div>
-        `).join('');
-      } catch (e) { console.error(e); }
-      try {
-        const { data: stateData } = await supabaseClient.from('confessions_by_state').select('*').limit(8);
-        const maxState = Math.max(...(stateData || []).map(d => d.count));
-        document.getElementById('stateChart').innerHTML = (stateData || []).map(d => `
-          <div class="chart-bar"><div class="label">${d.state}</div><div class="bar-container"><div class="bar" style="width: ${(d.count / maxState) * 100}%"><span>${d.count}</span></div></div></div>
-        `).join('');
-      } catch (e) { console.error(e); }
-      try {
-        const { data: keywordData } = await supabaseClient.from('keyword_stats').select('*').limit(10);
-        const maxKeyword = Math.max(...(keywordData || []).map(d => d.total_count));
-        document.getElementById('keywordChart').innerHTML = (keywordData || []).map(d => `
-          <div class="chart-bar"><div class="label">${d.keyword}</div><div class="bar-container"><div class="bar" style="width: ${(d.total_count / maxKeyword) * 100}%"><span>${d.total_count} (${d.percentage}%)</span></div></div></div>
-        `).join('');
-      } catch (e) { console.error(e); }
+        if (action === 'flag') {
+          await toggleFlag(id, !current);
+        } else if (action === 'hide') {
+          await toggleHide(id, !current);
+        } else if (action === 'delete') {
+          if (confirm('Are you sure you want to permanently delete this confession? This cannot be undone.')) {
+            await deleteConfession(id);
+          }
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+      
+      btn.disabled = false;
     }
 
     async function toggleFlag(id, flagged) {
-      try {
-        const { error } = await supabaseClient.from('confessions').update({ is_flagged: flagged, flagged_at: flagged ? new Date().toISOString() : null }).eq('id', id);
-        if (error) throw error;
-        loadConfessions(); loadConfessions(true); loadStats();
-      } catch (error) { alert('Error: ' + error.message); }
+      console.log('Toggling flag:', id, flagged);
+      
+      const updateData = { 
+        is_flagged: flagged, 
+        flagged_at: flagged ? new Date().toISOString() : null 
+      };
+      
+      const { data, error } = await supabaseClient
+        .from('confessions')
+        .update(updateData)
+        .eq('id', id)
+        .select();
+      
+      if (error) {
+        console.error('Flag error:', error);
+        throw error;
+      }
+      
+      console.log('Flag result:', data);
+      refreshAllLists();
     }
 
     async function toggleHide(id, hidden) {
-      try {
-        const { error } = await supabaseClient.from('confessions').update({ is_hidden: hidden }).eq('id', id);
-        if (error) throw error;
-        loadConfessions(); loadConfessions(true); loadStats();
-      } catch (error) { alert('Error: ' + error.message); }
+      console.log('Toggling hide:', id, hidden);
+      
+      const { data, error } = await supabaseClient
+        .from('confessions')
+        .update({ is_hidden: hidden })
+        .eq('id', id)
+        .select();
+      
+      if (error) {
+        console.error('Hide error:', error);
+        throw error;
+      }
+      
+      console.log('Hide result:', data);
+      refreshAllLists();
     }
 
     async function deleteConfession(id) {
-      if (!confirm('Are you sure you want to permanently delete this confession?')) return;
-      try {
-        const { error } = await supabaseClient.from('confessions').delete().eq('id', id);
-        if (error) throw error;
-        loadConfessions(); loadConfessions(true); loadStats();
-      } catch (error) { alert('Error: ' + error.message); }
+      console.log('Deleting:', id);
+      
+      // First delete related keyword_matches
+      const { error: kwError } = await supabaseClient
+        .from('keyword_matches')
+        .delete()
+        .eq('confession_id', id);
+      
+      if (kwError) {
+        console.error('Keyword delete error:', kwError);
+        // Continue anyway, might not have any matches
+      }
+      
+      // Then delete the confession
+      const { data, error } = await supabaseClient
+        .from('confessions')
+        .delete()
+        .eq('id', id)
+        .select();
+      
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
+      
+      console.log('Delete result:', data);
+      refreshAllLists();
     }
 
-    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-    function formatDate(dateString) { return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    function refreshAllLists() {
+      loadStats();
+      const activeTab = document.querySelector('.tab.active');
+      if (activeTab) {
+        const tabName = activeTab.dataset.tab;
+        if (tabName === 'confessions') loadConfessions('all');
+        else if (tabName === 'flagged') loadConfessions('flagged');
+        else if (tabName === 'hidden') loadConfessions('hidden');
+      }
+    }
 
+    // ============= ANALYTICS =============
+    async function loadAnalytics() {
+      try {
+        const { data: specialtyData } = await supabaseClient.from('confessions_by_specialty').select('*').limit(8);
+        if (specialtyData && specialtyData.length > 0) {
+          const maxSpecialty = Math.max(...specialtyData.map(d => d.count));
+          document.getElementById('specialtyChart').innerHTML = specialtyData.map(d => `
+            <div class="chart-bar"><div class="label">${d.specialty}</div><div class="bar-container"><div class="bar" style="width: ${(d.count / maxSpecialty) * 100}%"><span>${d.count}</span></div></div></div>
+          `).join('');
+        }
+      } catch (e) { console.error('Specialty chart error:', e); }
+      
+      try {
+        const { data: stateData } = await supabaseClient.from('confessions_by_state').select('*').limit(8);
+        if (stateData && stateData.length > 0) {
+          const maxState = Math.max(...stateData.map(d => d.count));
+          document.getElementById('stateChart').innerHTML = stateData.map(d => `
+            <div class="chart-bar"><div class="label">${d.state}</div><div class="bar-container"><div class="bar" style="width: ${(d.count / maxState) * 100}%"><span>${d.count}</span></div></div></div>
+          `).join('');
+        }
+      } catch (e) { console.error('State chart error:', e); }
+      
+      try {
+        const { data: keywordData } = await supabaseClient.from('keyword_stats').select('*').limit(10);
+        if (keywordData && keywordData.length > 0) {
+          const maxKeyword = Math.max(...keywordData.map(d => d.total_count));
+          document.getElementById('keywordChart').innerHTML = keywordData.map(d => `
+            <div class="chart-bar"><div class="label">${d.keyword}</div><div class="bar-container"><div class="bar" style="width: ${(d.total_count / maxKeyword) * 100}%"><span>${d.total_count} (${d.percentage}%)</span></div></div></div>
+          `).join('');
+        }
+      } catch (e) { console.error('Keyword chart error:', e); }
+    }
+
+    // ============= HELPERS =============
+    function escapeHtml(text) { 
+      const div = document.createElement('div'); 
+      div.textContent = text; 
+      return div.innerHTML; 
+    }
+    
+    function formatDate(dateString) { 
+      return new Date(dateString).toLocaleDateString('en-US', { 
+        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+      }); 
+    }
+
+    // ============= TABS =============
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('visible'));
         tab.classList.add('active');
-        document.getElementById(tab.dataset.tab + 'Tab').classList.add('visible');
-        if (tab.dataset.tab === 'flagged') loadConfessions(true);
-        if (tab.dataset.tab === 'analytics') loadAnalytics();
+        
+        const tabName = tab.dataset.tab;
+        document.getElementById(tabName + 'Tab').classList.add('visible');
+        
+        if (tabName === 'confessions') loadConfessions('all');
+        else if (tabName === 'flagged') loadConfessions('flagged');
+        else if (tabName === 'hidden') loadConfessions('hidden');
+        else if (tabName === 'analytics') loadAnalytics();
       });
     });
 
+    // ============= EVENT LISTENERS =============
     loginBtn.addEventListener('click', signIn);
     logoutBtn.addEventListener('click', signOut);
     passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') signIn(); });
+    emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') signIn(); });
+
+    // Check session on load
     checkSession();
   </script>
 </body>
