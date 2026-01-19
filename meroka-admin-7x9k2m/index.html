@@ -81,6 +81,19 @@
     .analytics-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .analytics-card h3 svg { width: 18px; height: 18px; color: #9b420f; }
 
+    /* Funnel */
+    .funnel-container { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding: 20px 0; flex-wrap: wrap; }
+    .funnel-step { flex: 1; min-width: 120px; text-align: center; }
+    .funnel-bar { background: linear-gradient(180deg, #9b420f, #b54d12); border-radius: 8px 8px 0 0; margin: 0 auto 12px; width: 80%; transition: height 0.5s ease; }
+    .funnel-value { font-size: 24px; font-weight: 700; color: #9b420f; margin-bottom: 4px; }
+    .funnel-label { font-size: 12px; color: #a8a29e; }
+    .funnel-rate { font-size: 11px; color: #22c55e; margin-top: 4px; }
+    
+    .click-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+    .click-stat { background: rgba(247,245,242,0.03); border-radius: 8px; padding: 16px; text-align: center; }
+    .click-stat .value { font-size: 24px; font-weight: 700; color: #9b420f; }
+    .click-stat .label { font-size: 11px; color: #a8a29e; margin-top: 4px; }
+
     /* Word Cloud */
     .word-cloud { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 20px; }
     .word-cloud .word { padding: 6px 12px; background: rgba(155,66,15,0.1); border-radius: 20px; color: #F7F5F2; font-weight: 500; transition: all 0.2s; cursor: default; }
@@ -208,6 +221,30 @@
         </div>
 
         <div class="analytics-grid">
+          <!-- Conversion Funnel -->
+          <div class="analytics-card full-width">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/></svg>Conversion Funnel</h3>
+            <div class="funnel-container" id="funnelContainer"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Click Stats -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>Social Clicks</h3>
+            <div id="clickStats"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Clicks by Specialty -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Engagement by Specialty</h3>
+            <div class="bar-chart" id="clicksBySpecialty"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Clicks by State -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Engagement by State</h3>
+            <div class="bar-chart" id="clicksByState"><div class="loading">Loading...</div></div>
+          </div>
+
           <!-- Word Cloud -->
           <div class="analytics-card">
             <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>Keyword Pain Points</h3>
@@ -406,7 +443,75 @@
 
     // ============= ANALYTICS =============
     async function loadAnalytics() {
-      await Promise.all([loadWordCloud(), loadTrending(), loadGeoStats(), loadSpecialtyChart(), loadYearsChart(), loadSpecialtyConcerns(), loadHeatMap()]);
+      await Promise.all([loadFunnel(), loadClickStats(), loadClicksBySpecialty(), loadClicksByState(), loadWordCloud(), loadTrending(), loadGeoStats(), loadSpecialtyChart(), loadYearsChart(), loadSpecialtyConcerns(), loadHeatMap()]);
+    }
+
+    async function loadFunnel() {
+      try {
+        const { data } = await supabaseClient.from('conversion_funnel').select('*').single();
+        analyticsData.funnel = data;
+        if (!data) { document.getElementById('funnelContainer').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        
+        const maxVal = Math.max(data.page_views || 1, 1);
+        const steps = [
+          { label: 'Page Views', value: data.page_views || 0 },
+          { label: 'Started Typing', value: data.started_typing || 0 },
+          { label: 'Submitted', value: data.submitted || 0 },
+          { label: 'Saw Social', value: data.saw_social || 0 }
+        ];
+        
+        let html = '';
+        steps.forEach((step, i) => {
+          const height = Math.max((step.value / maxVal) * 150, 20);
+          const prevVal = i > 0 ? steps[i-1].value : step.value;
+          const rate = prevVal > 0 ? ((step.value / prevVal) * 100).toFixed(1) : 0;
+          html += `<div class="funnel-step"><div class="funnel-bar" style="height:${height}px"></div><div class="funnel-value">${step.value}</div><div class="funnel-label">${step.label}</div>${i > 0 ? `<div class="funnel-rate">${rate}% conversion</div>` : ''}</div>`;
+        });
+        document.getElementById('funnelContainer').innerHTML = html;
+      } catch (e) { console.error('Funnel error:', e); document.getElementById('funnelContainer').innerHTML = '<div class="empty-state">No data yet</div>'; }
+    }
+
+    async function loadClickStats() {
+      try {
+        const { data } = await supabaseClient.from('conversion_funnel').select('*').single();
+        if (!data) { document.getElementById('clickStats').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        
+        const totalClicks = (data.clicks_x || 0) + (data.clicks_linkedin || 0) + (data.clicks_website || 0) + (data.clicks_partnership || 0);
+        
+        document.getElementById('clickStats').innerHTML = `
+          <div class="click-stats">
+            <div class="click-stat"><div class="value">${data.clicks_x || 0}</div><div class="label">X / Twitter</div></div>
+            <div class="click-stat"><div class="value">${data.clicks_linkedin || 0}</div><div class="label">LinkedIn</div></div>
+            <div class="click-stat"><div class="value">${data.clicks_website || 0}</div><div class="label">Website</div></div>
+            <div class="click-stat"><div class="value">${data.clicks_partnership || 0}</div><div class="label">Partnership</div></div>
+            <div class="click-stat"><div class="value">${totalClicks}</div><div class="label">Total Clicks</div></div>
+          </div>
+        `;
+      } catch (e) { console.error('Click stats error:', e); document.getElementById('clickStats').innerHTML = '<div class="empty-state">No data yet</div>'; }
+    }
+
+    async function loadClicksBySpecialty() {
+      try {
+        const { data } = await supabaseClient.from('clicks_by_specialty').select('*').limit(8);
+        analyticsData.clicksBySpecialty = data;
+        if (!data || data.length === 0) { document.getElementById('clicksBySpecialty').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        const max = Math.max(...data.map(d => d.total_clicks));
+        document.getElementById('clicksBySpecialty').innerHTML = data.filter(d => d.specialty !== 'Not specified' && d.total_clicks > 0).map(d => 
+          `<div class="bar-row"><span class="bar-label">${d.specialty}</span><div class="bar-container"><div class="bar-fill" style="width:${(d.total_clicks/max)*100}%"><span>${d.total_clicks}</span></div></div></div>`
+        ).join('') || '<div class="empty-state">No data</div>';
+      } catch (e) { console.error(e); document.getElementById('clicksBySpecialty').innerHTML = '<div class="empty-state">No data yet</div>'; }
+    }
+
+    async function loadClicksByState() {
+      try {
+        const { data } = await supabaseClient.from('clicks_by_state').select('*').limit(8);
+        analyticsData.clicksByState = data;
+        if (!data || data.length === 0) { document.getElementById('clicksByState').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        const max = Math.max(...data.map(d => d.total_clicks));
+        document.getElementById('clicksByState').innerHTML = data.filter(d => d.state !== 'Not specified' && d.total_clicks > 0).map(d => 
+          `<div class="bar-row"><span class="bar-label">${d.state}</span><div class="bar-container"><div class="bar-fill" style="width:${(d.total_clicks/max)*100}%"><span>${d.total_clicks}</span></div></div></div>`
+        ).join('') || '<div class="empty-state">No data</div>';
+      } catch (e) { console.error(e); document.getElementById('clicksByState').innerHTML = '<div class="empty-state">No data yet</div>'; }
     }
 
     async function loadWordCloud() {
@@ -549,6 +654,19 @@
       if (analyticsData.specialtyConcerns) {
         const ws7 = XLSX.utils.json_to_sheet(analyticsData.specialtyConcerns);
         XLSX.utils.book_append_sheet(wb, ws7, 'Specialty Concerns');
+      }
+      
+      if (analyticsData.clicksBySpecialty) {
+        const ws8 = XLSX.utils.json_to_sheet(analyticsData.clicksBySpecialty);
+        XLSX.utils.book_append_sheet(wb, ws8, 'Clicks by Specialty');
+      }
+      if (analyticsData.clicksByState) {
+        const ws9 = XLSX.utils.json_to_sheet(analyticsData.clicksByState);
+        XLSX.utils.book_append_sheet(wb, ws9, 'Clicks by State');
+      }
+      if (analyticsData.funnel) {
+        const ws10 = XLSX.utils.json_to_sheet([analyticsData.funnel]);
+        XLSX.utils.book_append_sheet(wb, ws10, 'Conversion Funnel');
       }
       
       XLSX.writeFile(wb, `meroka-analytics-${new Date().toISOString().split('T')[0]}.xlsx`);
