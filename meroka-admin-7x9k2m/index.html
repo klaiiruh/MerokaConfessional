@@ -511,26 +511,50 @@
 
     async function loadClicksBySpecialty() {
       try {
-        const { data } = await supabaseClient.from('clicks_by_specialty').select('*').limit(8);
+        const { data, error } = await supabaseClient.from('clicks_by_specialty').select('*').limit(8);
+        if (error) throw error;
         analyticsData.clicksBySpecialty = data;
-        if (!data || data.length === 0) { document.getElementById('clicksBySpecialty').innerHTML = '<div class="empty-state">No data</div>'; return; }
-        const max = Math.max(...data.map(d => d.total_clicks));
-        document.getElementById('clicksBySpecialty').innerHTML = data.filter(d => d.specialty !== 'Not specified' && d.total_clicks > 0).map(d => 
+    
+        // Filter out "Not specified" and zero clicks
+        const filtered = (data || []).filter(d => d.specialty !== 'Not specified' && d.total_clicks > 0);
+    
+        if (!filtered.length) { 
+          document.getElementById('clicksBySpecialty').innerHTML = '<div class="empty-state">No engagement data yet</div>'; 
+          return; 
+        }
+    
+        const max = Math.max(...filtered.map(d => d.total_clicks));
+        document.getElementById('clicksBySpecialty').innerHTML = filtered.map(d => 
           `<div class="bar-row"><span class="bar-label">${d.specialty}</span><div class="bar-container"><div class="bar-fill" style="width:${(d.total_clicks/max)*100}%"><span>${d.total_clicks}</span></div></div></div>`
-        ).join('') || '<div class="empty-state">No data</div>';
-      } catch (e) { console.error(e); document.getElementById('clicksBySpecialty').innerHTML = '<div class="empty-state">No data yet</div>'; }
+        ).join('');
+    } catch (e) { 
+        console.error('Clicks by specialty error:', e); 
+        document.getElementById('clicksBySpecialty').innerHTML = '<div class="empty-state">Error loading data</div>'; 
+      }
     }
 
     async function loadClicksByState() {
       try {
-        const { data } = await supabaseClient.from('clicks_by_state').select('*').limit(8);
+        const { data, error } = await supabaseClient.from('clicks_by_state').select('*').limit(8);
+        if (error) throw error;
         analyticsData.clicksByState = data;
-        if (!data || data.length === 0) { document.getElementById('clicksByState').innerHTML = '<div class="empty-state">No data</div>'; return; }
-        const max = Math.max(...data.map(d => d.total_clicks));
-        document.getElementById('clicksByState').innerHTML = data.filter(d => d.state !== 'Not specified' && d.total_clicks > 0).map(d => 
+        
+        // Filter out "Not specified" and zero clicks
+        const filtered = (data || []).filter(d => d.state !== 'Not specified' && d.total_clicks > 0);
+        
+        if (!filtered.length) { 
+          document.getElementById('clicksByState').innerHTML = '<div class="empty-state">No engagement data yet</div>'; 
+          return; 
+        }
+        
+        const max = Math.max(...filtered.map(d => d.total_clicks));
+        document.getElementById('clicksByState').innerHTML = filtered.map(d => 
           `<div class="bar-row"><span class="bar-label">${d.state}</span><div class="bar-container"><div class="bar-fill" style="width:${(d.total_clicks/max)*100}%"><span>${d.total_clicks}</span></div></div></div>`
-        ).join('') || '<div class="empty-state">No data</div>';
-      } catch (e) { console.error(e); document.getElementById('clicksByState').innerHTML = '<div class="empty-state">No data yet</div>'; }
+        ).join('');
+      } catch (e) { 
+        console.error('Clicks by state error:', e); 
+        document.getElementById('clicksByState').innerHTML = '<div class="empty-state">Error loading data</div>'; 
+      }
     }
 
     async function loadWordCloud() {
