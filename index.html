@@ -4,684 +4,195 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Physician Confessional</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body { 
-      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; 
-      background: #18212d; 
-      color: #F7F5F2; 
-      min-height: 100vh; 
-      overflow-x: hidden;
-      font-weight: 400;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-    
-    .ambient-glow { 
-      position: fixed; 
-      top: 0; 
-      left: 50%; 
-      transform: translateX(-50%); 
-      width: 800px; 
-      height: 400px; 
-      background: radial-gradient(ellipse, rgba(155,66,15,0.12) 0%, transparent 70%); 
-      pointer-events: none; 
-    }
-    
-    header { 
-      position: relative; 
-      z-index: 10; 
-      padding: 20px 40px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      max-width: 1200px; 
-      margin: 0 auto; 
-    }
-    
-    .logo { display: flex; align-items: center; gap: 12px; }
-    
-    .logo-text { 
-      color: #F7F5F2; 
-      font-weight: 600; 
-      font-size: 18px; 
-      letter-spacing: -0.01em; 
-    }
-    
-    .nav-btn { 
-      background: #9b420f; 
-      color: #FFFFFF; 
-      padding: 10px 20px; 
-      border-radius: 8px; 
-      font-size: 14px; 
-      font-weight: 500; 
-      text-decoration: none; 
-      transition: all 0.2s ease; 
-      border: none; 
-    }
-    .nav-btn:hover { 
-      background: #b54d12; 
-      transform: translateY(-1px); 
-    }
-    
-    .live-counter { 
-      text-align: center; 
-      padding: 16px 20px; 
-      margin: 0 auto 20px; 
-      max-width: 640px; 
-    }
-    
-    .counter-inner { 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 8px; 
-      padding: 10px 20px; 
-      background: rgba(155,66,15,0.15); 
-      border: 1px solid rgba(155,66,15,0.25); 
-      border-radius: 50px; 
-    }
-    
-    .counter-dot { 
-      width: 8px; 
-      height: 8px; 
-      background: #9b420f; 
-      border-radius: 50%; 
-      animation: pulse 2s ease-in-out infinite; 
-    }
-    
-    @keyframes pulse { 
-      0%, 100% { opacity: 1; transform: scale(1); } 
-      50% { opacity: 0.5; transform: scale(0.8); } 
-    }
-    
-    .counter-text { font-size: 14px; color: #F7F5F2; font-weight: 500; }
-    .counter-number { font-weight: 700; color: #9b420f; }
-    
-    main { 
-      position: relative; 
-      z-index: 10; 
-      max-width: 640px; 
-      margin: 0 auto; 
-      padding: 20px 24px 80px; 
-    }
-    
-    .hero { text-align: center; margin-bottom: 40px; }
-    
-    .hero-tag { 
-      display: inline-block; 
-      color: #9b420f; 
-      font-size: 13px; 
-      font-weight: 600; 
-      letter-spacing: 0.08em; 
-      text-transform: uppercase; 
-      margin-bottom: 20px; 
-    }
-    
-    .hero h1 { 
-      font-size: clamp(32px, 6vw, 48px); 
-      font-weight: 700; 
-      letter-spacing: -0.02em; 
-      line-height: 1.15; 
-      margin-bottom: 16px; 
-      color: #F7F5F2; 
-    }
-    
-    .rotating-word { 
-      display: inline-block; 
-      position: relative; 
-      color: #9b420f; 
-      min-width: 200px; 
-    }
-    
-    .rotating-word .word { display: inline-block; position: relative; }
-    .rotating-word .word.fade-out { animation: fadeOut 0.3s ease forwards; }
-    .rotating-word .word.fade-in { animation: fadeIn 0.3s ease forwards; }
-    
-    @keyframes fadeOut { 
-      0% { opacity: 1; transform: translateY(0); } 
-      100% { opacity: 0; transform: translateY(-8px); } 
-    }
-    @keyframes fadeIn { 
-      0% { opacity: 0; transform: translateY(8px); } 
-      100% { opacity: 1; transform: translateY(0); } 
-    }
-    
-    .hero p { 
-      color: #a8a29e; 
-      font-size: 16px; 
-      max-width: 400px; 
-      margin: 0 auto; 
-      line-height: 1.6; 
-    }
-    
-    .confession-box { 
-      background: rgba(247,245,242,0.03); 
-      border: 1px solid rgba(247,245,242,0.08); 
-      border-radius: 16px; 
-      padding: 28px; 
-    }
-    
-    .confession-input { 
-      width: 100%; 
-      min-height: 140px; 
-      background: transparent; 
-      border: none; 
-      color: #F7F5F2; 
-      font-size: 16px; 
-      font-family: inherit; 
-      line-height: 1.7; 
-      resize: none; 
-      outline: none; 
-      cursor: text; 
-    }
-    
-    .confession-input:empty:before { 
-      content: "I confess..."; 
-      color: #6b7280; 
-      pointer-events: none; 
-    }
-    
-    .confession-input .highlight { 
-      color: #FFFFFF; 
-      background: #9b420f; 
-      padding: 1px 6px; 
-      border-radius: 3px; 
-      font-weight: 600; 
-      position: relative; 
-      cursor: pointer; 
-    }
-    
-    .confession-input .highlight:hover::after { 
-      content: attr(data-tooltip); 
-      position: absolute; 
-      bottom: 100%; 
-      left: 50%; 
-      transform: translateX(-50%); 
-      background: #F7F5F2; 
-      color: #18212d; 
-      font-size: 12px; 
-      font-weight: 500; 
-      padding: 8px 12px; 
-      border-radius: 6px; 
-      white-space: nowrap; 
-      z-index: 100; 
-      margin-bottom: 6px; 
-    }
-    
-    .confession-input .highlight:hover::before { 
-      content: ""; 
-      position: absolute; 
-      bottom: 100%; 
-      left: 50%; 
-      transform: translateX(-50%); 
-      border: 5px solid transparent; 
-      border-top-color: #F7F5F2; 
-      margin-bottom: -4px; 
-      z-index: 100; 
-    }
-    
-    .matched-words-indicator { 
-      display: none; 
-      align-items: center; 
-      gap: 8px; 
-      margin-top: 16px; 
-      padding: 12px 14px; 
-      background: rgba(155,66,15,0.12); 
-      border-radius: 8px; 
-      font-size: 13px; 
-      color: #9b420f; 
-    }
-    .matched-words-indicator.visible { display: flex; }
-    .matched-words-indicator svg { width: 16px; height: 16px; flex-shrink: 0; }
-    
-    .form-options { 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 10px; 
-      margin-top: 20px; 
-      padding-top: 20px; 
-      border-top: 1px solid rgba(247,245,242,0.08); 
-    }
-    
-    .custom-select { position: relative; }
-    
-    .custom-select-btn { 
-      appearance: none; 
-      background: rgba(247,245,242,0.05); 
-      border: 1px solid rgba(247,245,242,0.1); 
-      border-radius: 8px; 
-      padding: 10px 16px; 
-      font-size: 13px; 
-      font-weight: 500; 
-      color: #F7F5F2; 
-      cursor: pointer; 
-      transition: all 0.2s ease; 
-      outline: none; 
-      padding-right: 36px; 
-      width: 100%; 
-      text-align: left; 
-      position: relative; 
-    }
-    
-    .custom-select-btn::after { 
-      content: ""; 
-      position: absolute; 
-      right: 12px; 
-      top: 50%; 
-      transform: translateY(-50%); 
-      width: 12px; 
-      height: 12px; 
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); 
-      background-repeat: no-repeat; 
-      background-size: contain; 
-      transition: transform 0.2s ease; 
-    }
-    
-    .custom-select.open .custom-select-btn::after { transform: translateY(-50%) rotate(180deg); }
-    .custom-select-btn:hover { border-color: rgba(247,245,242,0.2); background: rgba(247,245,242,0.08); }
-    .custom-select-btn.placeholder { color: #a8a29e; }
-    
-    .custom-select-dropdown { 
-      position: absolute; 
-      top: calc(100% + 4px); 
-      left: 0; 
-      min-width: 100%; 
-      background: #252f3d; 
-      border: 1px solid rgba(247,245,242,0.12); 
-      border-radius: 10px; 
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
-      padding: 6px; 
-      z-index: 100; 
-      opacity: 0; 
-      visibility: hidden; 
-      transform: translateY(-4px); 
-      transition: all 0.2s ease; 
-      max-height: 240px; 
-      overflow-y: auto; 
-    }
-
-    .custom-select-dropdown::-webkit-scrollbar {
-    width: 6px;
-    }
-
-.custom-select-dropdown::-webkit-scrollbar-track {
-  background: rgba(247,245,242,0.05);
-  border-radius: 3px;
-  }
-
-.custom-select-dropdown::-webkit-scrollbar-thumb {
-  background: rgba(155,66,15,0.5);
-  border-radius: 3px;
-  transition: background 0.2s ease;
-  }
-
-.custom-select-dropdown::-webkit-scrollbar-thumb:hover {
-  background: rgba(155,66,15,0.8);
-  }
-    
-    .custom-select.open .custom-select-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
-    
-    .custom-select-option { 
-      padding: 10px 12px; 
-      font-size: 13px; 
-      font-weight: 500; 
-      color: #F7F5F2; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      transition: all 0.15s ease; 
-    }
-    .custom-select-option:hover { background: rgba(155,66,15,0.2); color: #9b420f; }
-    .custom-select-option.selected { background: #9b420f; color: #fff; }
-    
-    .submit-btn { 
-      width: 100%; 
-      margin-top: 20px; 
-      padding: 14px; 
-      border-radius: 10px; 
-      border: none; 
-      font-size: 14px; 
-      font-weight: 600; 
-      font-family: inherit; 
-      cursor: pointer; 
-      transition: all 0.2s ease; 
-      background: rgba(247,245,242,0.08); 
-      color: #6b7280; 
-    }
-    .submit-btn.active { background: #9b420f; color: #fff; }
-    .submit-btn.active:hover { background: #b54d12; transform: translateY(-1px); }
-    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    .disclaimer { text-align: center; color: #6b7280; font-size: 13px; margin-top: 20px; }
-    
-    .post-submission { display: none; }
-    .post-submission.visible { display: block; }
-    
-    .thank-you { text-align: center; margin-bottom: 48px; animation: fadeIn 0.5s ease-out; }
-    
-    .thank-you-icon { 
-      width: 56px; 
-      height: 56px; 
-      margin: 0 auto 20px; 
-      border-radius: 50%; 
-      background: rgba(155,66,15,0.15); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer; 
-      transition: all 0.3s ease; 
-    }
-    .thank-you-icon:hover { transform: scale(1.1); background: rgba(155,66,15,0.25); }
-    .thank-you-icon svg { width: 28px; height: 28px; color: #9b420f; }
-    
-    .thank-you h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #F7F5F2; letter-spacing: -0.02em; }
-    .thank-you p { color: #a8a29e; font-size: 16px; }
-    
-    .user-confession-highlight { 
-      background: linear-gradient(135deg, #9b420f 0%, #b54d12 100%); 
-      border-radius: 16px; 
-      padding: 24px 28px; 
-      margin-bottom: 40px; 
-      animation: fadeIn 0.6s ease-out; 
-    }
-    .user-confession-label { 
-      font-size: 11px; 
-      font-weight: 600; 
-      letter-spacing: 0.1em; 
-      text-transform: uppercase; 
-      color: rgba(255,255,255,0.7); 
-      margin-bottom: 12px; 
-    }
-    .user-confession-text { 
-      font-size: 18px; 
-      font-weight: 500; 
-      line-height: 1.6; 
-      color: #fff; 
-      font-style: italic; 
-    }
-    .user-confession-text::before { content: '"'; }
-    .user-confession-text::after { content: '"'; }
-    
-    .confessions-feed { margin-bottom: 48px; }
-    
-    .confession-card { 
-      background: rgba(247,245,242,0.03); 
-      border: 1px solid rgba(247,245,242,0.08); 
-      border-radius: 12px; 
-      padding: 24px; 
-      margin-bottom: 12px; 
-      opacity: 0; 
-      transform: translateY(12px); 
-      transition: all 0.4s ease; 
-    }
-    .confession-card.visible { opacity: 1; transform: translateY(0); }
-    .confession-card p { color: #d1ccc4; font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
-    .confession-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b7280; }
-    
-    .cta-section { 
-      text-align: center; 
-      padding: 36px; 
-      border-radius: 16px; 
-      background: rgba(251,245,235,0.05); 
-      border: 1px solid rgba(247,245,242,0.08); 
-      opacity: 0; 
-      transform: translateY(12px); 
-      transition: all 0.5s ease; 
-    }
-    .cta-section.visible { opacity: 1; transform: translateY(0); }
-    
-    .cta-tag { 
-      display: inline-block; 
-      color: #9b420f; 
-      font-size: 12px; 
-      font-weight: 600; 
-      letter-spacing: 0.08em; 
-      text-transform: uppercase; 
-      margin-bottom: 12px; 
-    }
-    .cta-section h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #F7F5F2; letter-spacing: -0.01em; }
-    .cta-section > p { color: #a8a29e; max-width: 380px; margin: 0 auto 24px; font-size: 14px; line-height: 1.6; }
-    
-    .social-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-    
-    .social-link { 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
-      padding: 10px 16px; 
-      border-radius: 8px; 
-      background: rgba(247,245,242,0.05); 
-      border: 1px solid rgba(247,245,242,0.1); 
-      color: #F7F5F2; 
-      text-decoration: none; 
-      font-size: 13px; 
-      font-weight: 500; 
-      transition: all 0.2s ease; 
-    }
-    .social-link:hover { background: #9b420f; border-color: #9b420f; }
-    .social-link svg { width: 16px; height: 16px; }
-    
-    .pre-submission.hidden { display: none; }
-    
-    footer { 
-      text-align: center; 
-      padding: 24px; 
-      color: #6b7280; 
-      font-size: 13px; 
-      border-top: 1px solid rgba(247,245,242,0.06); 
-    }
-    footer a { color: #a8a29e; text-decoration: none; transition: color 0.2s ease; }
-    footer a:hover { color: #9b420f; }
-    
-    .anon-header { display: flex; }
-    .anon-header.hidden { display: none; }
-    .meroka-header { display: none; }
-    .meroka-header.visible { display: flex; }
-    
-    .anon-logo-icon { 
-      width: 36px; 
-      height: 36px; 
-      background: linear-gradient(135deg, #9b420f, #b54d12); 
-      border-radius: 8px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-    }
-    .anon-logo-icon svg { width: 20px; height: 20px; color: #fff; }
-    .anon-tag { font-size: 13px; color: #a8a29e; }
-    
-    @media (max-width: 600px) { 
-      header { padding: 16px 20px; } 
-      main { padding: 20px 20px 60px; } 
-      .nav-btn { padding: 8px 14px; font-size: 13px; } 
-      .social-links { flex-direction: column; } 
-      .cta-section { padding: 28px 20px; } 
-      .rotating-word { min-width: 140px; } 
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Geist',-apple-system,BlinkMacSystemFont,sans-serif;background:#18212d;color:#F7F5F2;min-height:100vh;overflow-x:hidden;font-size:16px;line-height:1.6}
+    .ambient-glow{position:fixed;top:0;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(155,66,15,0.12) 0%,transparent 70%);pointer-events:none}
+    header{position:relative;z-index:10;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo-text{color:#F7F5F2;font-weight:600;font-size:18px;letter-spacing:-0.01em}
+    .nav-btn{background:#9b420f;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all 0.2s;border:none}
+    .nav-btn:hover{background:#b54d12;transform:translateY(-1px)}
+    .live-counter{text-align:center;padding:16px 20px;margin:0 auto 20px;max-width:640px}
+    .counter-inner{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(155,66,15,0.15);border:1px solid rgba(155,66,15,0.25);border-radius:50px}
+    .counter-dot{width:8px;height:8px;background:#9b420f;border-radius:50%;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+    .counter-text{font-size:14px;color:#F7F5F2;font-weight:500}
+    .counter-number{font-weight:700;color:#9b420f}
+    main{position:relative;z-index:10;max-width:640px;margin:0 auto;padding:20px 24px 80px}
+    .hero{text-align:center;margin-bottom:40px}
+    .hero-tag{display:inline-block;color:#9b420f;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px}
+    .hero h1{font-size:clamp(32px,6vw,48px);font-weight:700;letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px;color:#F7F5F2}
+    .rotating-word{display:inline-block;position:relative;color:#9b420f;min-width:200px}
+    .rotating-word .word{display:inline-block;position:relative}
+    .rotating-word .word.fade-out{animation:fadeOut 0.3s ease forwards}
+    .rotating-word .word.fade-in{animation:fadeIn 0.3s ease forwards}
+    @keyframes fadeOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-8px)}}
+    @keyframes fadeIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+    .hero p{color:#a8a29e;font-size:16px;max-width:400px;margin:0 auto;line-height:1.6}
+    .confession-box{background:rgba(247,245,242,0.03);border:1px solid rgba(247,245,242,0.08);border-radius:16px;padding:28px}
+    .confession-input{width:100%;min-height:140px;background:transparent;border:none;color:#F7F5F2;font-size:16px;font-family:inherit;line-height:1.7;resize:none;outline:none;cursor:text}
+    .confession-input:empty:before{content:"I confess...";color:#6b7280;pointer-events:none}
+    .confession-input .highlight{color:#fff;background:#9b420f;padding:1px 6px;border-radius:3px;font-weight:600;position:relative;cursor:pointer}
+    .matched-words-indicator{display:none;align-items:center;gap:8px;margin-top:16px;padding:12px 14px;background:rgba(155,66,15,0.12);border-radius:8px;font-size:13px;color:#9b420f}
+    .matched-words-indicator.visible{display:flex}
+    .matched-words-indicator svg{width:16px;height:16px;flex-shrink:0}
+    .form-options{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid rgba(247,245,242,0.08)}
+    .custom-select{position:relative}
+    .custom-select-btn{appearance:none;background:rgba(247,245,242,0.05);border:1px solid rgba(247,245,242,0.1);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;color:#F7F5F2;cursor:pointer;transition:all 0.2s;outline:none;padding-right:36px;width:100%;text-align:left;position:relative}
+    .custom-select-btn::after{content:"";position:absolute;right:12px;top:50%;transform:translateY(-50%);width:12px;height:12px;background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a8a29e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:contain;transition:transform 0.2s}
+    .custom-select.open .custom-select-btn::after{transform:translateY(-50%) rotate(180deg)}
+    .custom-select-btn:hover{border-color:rgba(247,245,242,0.2);background:rgba(247,245,242,0.08)}
+    .custom-select-btn.placeholder{color:#a8a29e}
+    .custom-select-dropdown{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;background:#252f3d;border:1px solid rgba(247,245,242,0.12);border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.4);padding:6px;z-index:100;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all 0.2s;max-height:240px;overflow-y:auto;scroll-behavior:smooth}
+    .custom-select-dropdown::-webkit-scrollbar{width:6px}
+    .custom-select-dropdown::-webkit-scrollbar-track{background:rgba(247,245,242,0.05);border-radius:3px}
+    .custom-select-dropdown::-webkit-scrollbar-thumb{background:rgba(155,66,15,0.5);border-radius:3px}
+    .custom-select.open .custom-select-dropdown{opacity:1;visibility:visible;transform:translateY(0)}
+    .custom-select-option{padding:10px 12px;font-size:13px;font-weight:500;color:#F7F5F2;border-radius:6px;cursor:pointer;transition:all 0.15s}
+    .custom-select-option:hover{background:rgba(155,66,15,0.2);color:#9b420f}
+    .custom-select-option.selected{background:#9b420f;color:#fff}
+    .submit-btn{width:100%;margin-top:20px;padding:14px;border-radius:10px;border:none;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.2s;background:rgba(247,245,242,0.08);color:#6b7280}
+    .submit-btn.active{background:#9b420f;color:#fff}
+    .submit-btn.active:hover{background:#b54d12;transform:translateY(-1px)}
+    .submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .disclaimer{text-align:center;color:#6b7280;font-size:13px;margin-top:20px}
+    .post-submission{display:none}
+    .post-submission.visible{display:block}
+    .thank-you{text-align:center;margin-bottom:48px;animation:fadeIn 0.5s ease-out}
+    .thank-you-icon{width:56px;height:56px;margin:0 auto 20px;border-radius:50%;background:rgba(155,66,15,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s}
+    .thank-you-icon:hover{transform:scale(1.1);background:rgba(155,66,15,0.25)}
+    .thank-you-icon svg{width:28px;height:28px;color:#9b420f}
+    .thank-you h2{font-size:28px;font-weight:700;margin-bottom:8px;color:#F7F5F2;letter-spacing:-0.02em}
+    .thank-you p{color:#a8a29e;font-size:16px}
+    .user-confession-highlight{background:linear-gradient(135deg,#9b420f 0%,#b54d12 100%);border-radius:16px;padding:24px 28px;margin-bottom:40px;animation:fadeIn 0.6s ease-out}
+    .user-confession-label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:12px}
+    .user-confession-text{font-size:18px;font-weight:500;line-height:1.6;color:#fff;font-style:italic}
+    .user-confession-text::before{content:'"'}
+    .user-confession-text::after{content:'"'}
+    .confessions-feed{margin-bottom:48px}
+    .confession-card{background:rgba(247,245,242,0.03);border:1px solid rgba(247,245,242,0.08);border-radius:12px;padding:24px;margin-bottom:12px;opacity:0;transform:translateY(12px);transition:all 0.4s}
+    .confession-card.visible{opacity:1;transform:translateY(0)}
+    .confession-card p{color:#d1ccc4;font-size:15px;line-height:1.7;margin-bottom:12px}
+    .confession-meta{display:flex;align-items:center;gap:8px;font-size:13px;color:#6b7280}
+    .cta-section{text-align:center;padding:36px;border-radius:16px;background:rgba(251,245,235,0.05);border:1px solid rgba(247,245,242,0.08);opacity:0;transform:translateY(12px);transition:all 0.5s}
+    .cta-section.visible{opacity:1;transform:translateY(0)}
+    .cta-tag{display:inline-block;color:#9b420f;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px}
+    .cta-section h3{font-size:22px;font-weight:700;margin-bottom:8px;color:#F7F5F2;letter-spacing:-0.01em}
+    .cta-section>p{color:#a8a29e;max-width:380px;margin:0 auto 24px;font-size:14px;line-height:1.6}
+    .social-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .social-link{display:flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;background:rgba(247,245,242,0.05);border:1px solid rgba(247,245,242,0.1);color:#F7F5F2;text-decoration:none;font-size:13px;font-weight:500;transition:all 0.2s}
+    .social-link:hover{background:#9b420f;border-color:#9b420f}
+    .social-link svg{width:16px;height:16px}
+    .pre-submission.hidden{display:none}
+    footer{text-align:center;padding:24px;color:#6b7280;font-size:13px;border-top:1px solid rgba(247,245,242,0.06)}
+    footer a{color:#a8a29e;text-decoration:none;transition:color 0.2s}
+    footer a:hover{color:#9b420f}
+    .anon-header{display:flex}
+    .anon-header.hidden{display:none}
+    .meroka-header{display:none}
+    .meroka-header.visible{display:flex}
+    .anon-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#9b420f,#b54d12);border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .anon-logo-icon svg{width:20px;height:20px;color:#fff}
+    .anon-tag{font-size:13px;color:#a8a29e}
+    @media(max-width:600px){header{padding:16px 20px}main{padding:20px 20px 60px}.nav-btn{padding:8px 14px;font-size:13px}.social-links{flex-direction:column}.cta-section{padding:28px 20px}.rotating-word{min-width:140px}}
   </style>
 </head>
 <body>
   <div class="ambient-glow"></div>
-
   <header class="anon-header" id="anonHeader">
     <div class="logo">
-      <div class="anon-logo-icon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-      </div>
+      <div class="anon-logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
       <span class="logo-text">The Confessional</span>
     </div>
     <span class="anon-tag">By a fellow physician</span>
   </header>
-
   <header class="meroka-header" id="merokaHeader">
     <div class="logo">
-       <div class="anon-logo-icon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-      </div>
+      <div class="anon-logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
       <span class="logo-text">The Confessional</span>
     </div>
-    <a href="https://www.meroka.com/contact" target="_blank" class="nav-btn">Explore partnership</a>
+    <a href="https://www.meroka.com/contact" target="_blank" class="nav-btn" id="partnershipBtn">Explore partnership</a>
   </header>
-
-  <div class="live-counter">
-    <div class="counter-inner">
-      <div class="counter-dot"></div>
-      <span class="counter-text"><span class="counter-number" id="confessionCount">Loading...</span> physicians have confessed</span>
-    </div>
-  </div>
-
+  <div class="live-counter"><div class="counter-inner"><div class="counter-dot"></div><span class="counter-text"><span class="counter-number" id="confessionCount">Loading...</span> physicians have confessed</span></div></div>
   <main class="pre-submission" id="preSubmission">
     <div class="hero">
       <span class="hero-tag">The Physician Confessional</span>
       <h1>What's <span class="rotating-word"><span class="word" id="rotatingWord">destroying</span></span> you?</h1>
       <p>For independent physicians done playing by the rules.</p>
     </div>
-
     <div class="confession-box">
       <div class="confession-input" id="confessionInput" contenteditable="true"></div>
-      <div class="matched-words-indicator" id="matchedIndicator">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span>Hover highlighted words to see how many physicians share your frustration</span>
-      </div>
+      <div class="matched-words-indicator" id="matchedIndicator"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Hover highlighted words to see how many physicians share your frustration</span></div>
       <div class="form-options">
-        <div class="custom-select" id="specialtySelect">
-          <button type="button" class="custom-select-btn placeholder">Specialty (optional)</button>
-          <div class="custom-select-dropdown">
-            <div class="custom-select-option" data-value="OB/GYN">OB/GYN</div>
-            <div class="custom-select-option" data-value="Family Medicine">Family Medicine</div>
-            <div class="custom-select-option" data-value="Internal Medicine">Internal Medicine</div>
-            <div class="custom-select-option" data-value="Pediatrics">Pediatrics</div>
-            <div class="custom-select-option" data-value="Cardiology">Cardiology</div>
-            <div class="custom-select-option" data-value="Dermatology">Dermatology</div>
-            <div class="custom-select-option" data-value="Oncology">Oncology</div>
-            <div class="custom-select-option" data-value="Other">Other</div>
-          </div>
-        </div>
-        <div class="custom-select" id="yearsSelect">
-          <button type="button" class="custom-select-btn placeholder">Years independent (optional)</button>
-          <div class="custom-select-dropdown">
-            <div class="custom-select-option" data-value="0-2 years">0-2 years</div>
-            <div class="custom-select-option" data-value="3-5 years">3-5 years</div>
-            <div class="custom-select-option" data-value="6-10 years">6-10 years</div>
-            <div class="custom-select-option" data-value="10+ years">10+ years</div>
-          </div>
-        </div>
-        <div class="custom-select" id="stateSelect">
-          <button type="button" class="custom-select-btn placeholder">State (optional)</button>
-          <div class="custom-select-dropdown">
-            <div class="custom-select-option" data-value="Alabama">Alabama</div>
-            <div class="custom-select-option" data-value="Alaska">Alaska</div>
-            <div class="custom-select-option" data-value="Arizona">Arizona</div>
-            <div class="custom-select-option" data-value="Arkansas">Arkansas</div>
-            <div class="custom-select-option" data-value="California">California</div>
-            <div class="custom-select-option" data-value="Colorado">Colorado</div>
-            <div class="custom-select-option" data-value="Connecticut">Connecticut</div>
-            <div class="custom-select-option" data-value="Delaware">Delaware</div>
-            <div class="custom-select-option" data-value="Florida">Florida</div>
-            <div class="custom-select-option" data-value="Georgia">Georgia</div>
-            <div class="custom-select-option" data-value="Hawaii">Hawaii</div>
-            <div class="custom-select-option" data-value="Idaho">Idaho</div>
-            <div class="custom-select-option" data-value="Illinois">Illinois</div>
-            <div class="custom-select-option" data-value="Indiana">Indiana</div>
-            <div class="custom-select-option" data-value="Iowa">Iowa</div>
-            <div class="custom-select-option" data-value="Kansas">Kansas</div>
-            <div class="custom-select-option" data-value="Kentucky">Kentucky</div>
-            <div class="custom-select-option" data-value="Louisiana">Louisiana</div>
-            <div class="custom-select-option" data-value="Maine">Maine</div>
-            <div class="custom-select-option" data-value="Maryland">Maryland</div>
-            <div class="custom-select-option" data-value="Massachusetts">Massachusetts</div>
-            <div class="custom-select-option" data-value="Michigan">Michigan</div>
-            <div class="custom-select-option" data-value="Minnesota">Minnesota</div>
-            <div class="custom-select-option" data-value="Mississippi">Mississippi</div>
-            <div class="custom-select-option" data-value="Missouri">Missouri</div>
-            <div class="custom-select-option" data-value="Montana">Montana</div>
-            <div class="custom-select-option" data-value="Nebraska">Nebraska</div>
-            <div class="custom-select-option" data-value="Nevada">Nevada</div>
-            <div class="custom-select-option" data-value="New Hampshire">New Hampshire</div>
-            <div class="custom-select-option" data-value="New Jersey">New Jersey</div>
-            <div class="custom-select-option" data-value="New Mexico">New Mexico</div>
-            <div class="custom-select-option" data-value="New York">New York</div>
-            <div class="custom-select-option" data-value="North Carolina">North Carolina</div>
-            <div class="custom-select-option" data-value="North Dakota">North Dakota</div>
-            <div class="custom-select-option" data-value="Ohio">Ohio</div>
-            <div class="custom-select-option" data-value="Oklahoma">Oklahoma</div>
-            <div class="custom-select-option" data-value="Oregon">Oregon</div>
-            <div class="custom-select-option" data-value="Pennsylvania">Pennsylvania</div>
-            <div class="custom-select-option" data-value="Rhode Island">Rhode Island</div>
-            <div class="custom-select-option" data-value="South Carolina">South Carolina</div>
-            <div class="custom-select-option" data-value="South Dakota">South Dakota</div>
-            <div class="custom-select-option" data-value="Tennessee">Tennessee</div>
-            <div class="custom-select-option" data-value="Texas">Texas</div>
-            <div class="custom-select-option" data-value="Utah">Utah</div>
-            <div class="custom-select-option" data-value="Vermont">Vermont</div>
-            <div class="custom-select-option" data-value="Virginia">Virginia</div>
-            <div class="custom-select-option" data-value="Washington">Washington</div>
-            <div class="custom-select-option" data-value="West Virginia">West Virginia</div>
-            <div class="custom-select-option" data-value="Wisconsin">Wisconsin</div>
-            <div class="custom-select-option" data-value="Wyoming">Wyoming</div>
-          </div>
-        </div>
+        <div class="custom-select" id="specialtySelect"><button type="button" class="custom-select-btn placeholder">Specialty (optional)</button><div class="custom-select-dropdown"><div class="custom-select-option" data-value="OB/GYN">OB/GYN</div><div class="custom-select-option" data-value="Family Medicine">Family Medicine</div><div class="custom-select-option" data-value="Internal Medicine">Internal Medicine</div><div class="custom-select-option" data-value="Pediatrics">Pediatrics</div><div class="custom-select-option" data-value="Cardiology">Cardiology</div><div class="custom-select-option" data-value="Dermatology">Dermatology</div><div class="custom-select-option" data-value="Oncology">Oncology</div><div class="custom-select-option" data-value="Other">Other</div></div></div>
+        <div class="custom-select" id="yearsSelect"><button type="button" class="custom-select-btn placeholder">Years independent (optional)</button><div class="custom-select-dropdown"><div class="custom-select-option" data-value="0-2 years">0-2 years</div><div class="custom-select-option" data-value="3-5 years">3-5 years</div><div class="custom-select-option" data-value="6-10 years">6-10 years</div><div class="custom-select-option" data-value="10+ years">10+ years</div></div></div>
+        <div class="custom-select" id="stateSelect"><button type="button" class="custom-select-btn placeholder">State (optional)</button><div class="custom-select-dropdown"><div class="custom-select-option" data-value="Alabama">Alabama</div><div class="custom-select-option" data-value="Alaska">Alaska</div><div class="custom-select-option" data-value="Arizona">Arizona</div><div class="custom-select-option" data-value="California">California</div><div class="custom-select-option" data-value="Colorado">Colorado</div><div class="custom-select-option" data-value="Florida">Florida</div><div class="custom-select-option" data-value="Georgia">Georgia</div><div class="custom-select-option" data-value="Illinois">Illinois</div><div class="custom-select-option" data-value="New York">New York</div><div class="custom-select-option" data-value="Texas">Texas</div><div class="custom-select-option" data-value="Pennsylvania">Pennsylvania</div><div class="custom-select-option" data-value="Other">Other</div></div></div>
       </div>
       <button class="submit-btn" id="submitBtn">Release the weight</button>
     </div>
     <p class="disclaimer">Your confession is completely anonymous.</p>
   </main>
-
   <main class="post-submission" id="postSubmission">
-    <div class="thank-you">
-      <div class="thank-you-icon" id="thankYouIcon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-      </div>
-      <h2>You're not alone.</h2>
-      <p>See what other physicians have confessed.</p>
-    </div>
-    <div class="user-confession-highlight">
-      <p class="user-confession-label">Your confession</p>
-      <p class="user-confession-text" id="userConfessionText"></p>
-    </div>
+    <div class="thank-you"><div class="thank-you-icon" id="thankYouIcon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><h2>You're not alone.</h2><p>See what other physicians have confessed.</p></div>
+    <div class="user-confession-highlight"><p class="user-confession-label">Your confession</p><p class="user-confession-text" id="userConfessionText"></p></div>
     <div class="confessions-feed" id="confessionsFeed"></div>
     <div class="cta-section" id="ctaSection">
       <span class="cta-tag">Coming Soon</span>
       <h3>A New Collective is underway.</h3>
       <p>We are engineering a clinical mutiny—giving the power back to the doctors the system tried to crush.</p>
       <div class="social-links">
-        <a href="https://x.com/MerokaInc" target="_blank" class="social-link"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>X</span></a>
-        <a href="https://www.linkedin.com/company/merokainc/" target="_blank" class="social-link"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span>LinkedIn</span></a>
-        <a href="https://www.meroka.com/" target="_blank" class="social-link"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><span>Website</span></a>
+        <a href="https://x.com/MerokaInc" target="_blank" class="social-link" data-track="click_x"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg><span>X</span></a>
+        <a href="https://www.linkedin.com/company/merokainc/" target="_blank" class="social-link" data-track="click_linkedin"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span>LinkedIn</span></a>
+        <a href="https://www.meroka.com/" target="_blank" class="social-link" data-track="click_website"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><span>Website</span></a>
       </div>
     </div>
   </main>
-
-  <footer id="footer">
-    <p>© 2026 Meroka Inc. All rights reserved.</p>
-    <p style="margin-top: 6px;"><a href="https://www.meroka.com/privacy" target="_blank">Privacy</a> · <a href="https://www.meroka.com/terms" target="_blank">Terms</a></p>
-  </footer>
+  <footer><p>© 2026 Meroka Inc. All rights reserved.</p><p style="margin-top:6px;"><a href="https://www.meroka.com/privacy" target="_blank">Privacy</a> · <a href="https://www.meroka.com/terms" target="_blank">Terms</a></p></footer>
 
   <script>
-    const SUPABASE_URL = 'https://hjomlxpovxgjweauiewt.supabase.co'; 
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb21seHBvdnhnandlYXVpZXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODQzMDUsImV4cCI6MjA4NDE2MDMwNX0.UcevzUHjnhikSQsHUuK4sfWM7ZFjVJ-X9pdaokUYmxo'; 
+    const SUPABASE_URL = 'https://hjomlxpovxgjweauiewt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb21seHBvdnhnandlYXVpZXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODQzMDUsImV4cCI6MjA4NDE2MDMwNX0.UcevzUHjnhikSQsHUuK4sfWM7ZFjVJ-X9pdaokUYmxo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Generate unique session ID
+    const sessionId = localStorage.getItem('session_id') || (()=>{const id=crypto.randomUUID();localStorage.setItem('session_id',id);return id})();
+    
     const TRACKED_KEYWORDS = ['burnout','exhausted','overwhelmed','alone','drowning','frustrated','stressed','tired','insurance','prior authorization','prior auth','denied','reimbursement','underpaid','billing','coding','administrative','paperwork','documentation','ehr','emr','charting','staff','turnover','hiring','admin','understaffed','payroll','overhead','rent','cash flow','debt','loans','struggling','survive','quit','leaving','retire','patients','time','hours','weekends','family','balance','health','sleep','anxiety','depression','isolated','unsupported'];
-
+    
     let keywordStats = {}, selectedSpecialty = null, selectedYears = null, selectedState = null;
+    let hasStartedTyping = false, currentConfessionId = null;
 
+    // ============= EVENT TRACKING =============
+    async function trackEvent(eventType, eventData = {}) {
+      try {
+        await supabaseClient.from('events').insert({
+          event_type: eventType,
+          event_data: eventData,
+          confession_id: currentConfessionId,
+          specialty: selectedSpecialty,
+          state: selectedState,
+          session_id: sessionId
+        });
+      } catch (e) { console.error('Track error:', e); }
+    }
+
+    // Track page view on load
+    trackEvent('page_view');
+
+    // ============= DATA FUNCTIONS =============
     async function fetchConfessionCount() {
       try {
-        const { count, error } = await supabaseClient.from('confessions').select('*', { count: 'exact', head: true });
-        if (error) throw error;
+        const { count } = await supabaseClient.from('confessions').select('*', { count: 'exact', head: true });
         document.getElementById('confessionCount').textContent = count || 0;
       } catch (e) { document.getElementById('confessionCount').textContent = '...'; }
     }
 
     async function fetchKeywordStats() {
       try {
-        const { data, error } = await supabaseClient.from('keyword_stats').select('*');
-        if (error) throw error;
+        const { data } = await supabaseClient.from('keyword_stats').select('*');
         keywordStats = {};
         if (data) data.forEach(s => { keywordStats[s.keyword.toLowerCase()] = { totalCount: s.total_count, percentage: s.percentage }; });
       } catch (e) { console.error('Error:', e); }
@@ -691,9 +202,12 @@
       const keywords = extractKeywords(text), wordCount = countWords(text);
       const { data: confession, error } = await supabaseClient.from('confessions').insert({ confession_text: text, specialty, years_independent: years, state, word_count: wordCount }).select().single();
       if (error) throw error;
+      currentConfessionId = confession.id;
       if (keywords.length > 0) {
         await supabaseClient.from('keyword_matches').insert(keywords.map(k => ({ confession_id: confession.id, keyword: k.toLowerCase() })));
       }
+      // Track submission
+      trackEvent('confession_submitted', { word_count: wordCount, keyword_count: keywords.length });
       return confession;
     }
 
@@ -719,10 +233,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      await fetchConfessionCount(); await fetchKeywordStats();
-      setInterval(fetchConfessionCount, 30000); setInterval(fetchKeywordStats, 120000);
+      await fetchConfessionCount();
+      await fetchKeywordStats();
+      setInterval(fetchConfessionCount, 30000);
+      setInterval(fetchKeywordStats, 120000);
     });
 
+    // Rotating words
     const rotatingWords = ["destroying","breaking","exhausting","draining","overwhelming","crushing","burying","suffocating"];
     let currentIndex = 0;
     const wordEl = document.getElementById("rotatingWord");
@@ -731,11 +248,13 @@
       setTimeout(() => {
         currentIndex = (currentIndex + 1) % rotatingWords.length;
         wordEl.textContent = rotatingWords[currentIndex];
-        wordEl.classList.remove("fade-out"); wordEl.classList.add("fade-in");
+        wordEl.classList.remove("fade-out");
+        wordEl.classList.add("fade-in");
         setTimeout(() => wordEl.classList.remove("fade-in"), 300);
       }, 300);
     }, 2500);
 
+    // Input handling
     const inputEl = document.getElementById("confessionInput"), btn = document.getElementById("submitBtn"), matchedIndicator = document.getElementById("matchedIndicator");
     let isProcessing = false;
 
@@ -745,8 +264,16 @@
     function restoreCursor(el, pos) { if (pos === null) return; const sel = window.getSelection(), range = document.createRange(), walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false); let cur = 0, node; while (node = walker.nextNode()) { if (cur + node.textContent.length >= pos) { range.setStart(node, pos - cur); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); return; } cur += node.textContent.length; } range.selectNodeContents(el); range.collapse(false); sel.removeAllRanges(); sel.addRange(range); }
 
     function highlightKeywords() {
-      if (isProcessing) return; isProcessing = true;
+      if (isProcessing) return;
+      isProcessing = true;
       const text = getTextContent(inputEl), cursorPos = saveCursor(inputEl);
+      
+      // Track started typing (only once)
+      if (!hasStartedTyping && text.length > 0) {
+        hasStartedTyping = true;
+        trackEvent('started_typing');
+      }
+      
       let hasMatches = false;
       const keywords = Object.keys(keywordStats).length > 0 ? Object.keys(keywordStats) : TRACKED_KEYWORDS;
       const sortedKw = keywords.sort((a,b) => b.length - a.length);
@@ -762,8 +289,10 @@
       isProcessing = false;
     }
 
-    let debounce; inputEl.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(highlightKeywords, 300); });
+    let debounce;
+    inputEl.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(highlightKeywords, 300); });
 
+    // Custom selects
     document.querySelectorAll(".custom-select").forEach(sel => {
       const btn = sel.querySelector(".custom-select-btn"), opts = sel.querySelectorAll(".custom-select-option"), selectId = sel.id;
       btn.addEventListener("click", e => { e.stopPropagation(); document.querySelectorAll(".custom-select").forEach(s => { if (s !== sel) s.classList.remove("open"); }); sel.classList.toggle("open"); });
@@ -771,9 +300,12 @@
     });
     document.addEventListener("click", () => { document.querySelectorAll(".custom-select").forEach(s => s.classList.remove("open")); });
 
+    // Submit
     btn.addEventListener("click", async () => {
-      const text = getTextContent(inputEl); if (countWords(text) < 5) return;
-      btn.disabled = true; btn.textContent = 'Submitting...';
+      const text = getTextContent(inputEl);
+      if (countWords(text) < 5) return;
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
       try {
         await submitConfession(text, selectedSpecialty, selectedYears, selectedState);
         document.getElementById("userConfessionText").textContent = text;
@@ -781,11 +313,30 @@
         document.getElementById("postSubmission").classList.add("visible");
         document.getElementById("anonHeader").classList.add("hidden");
         document.getElementById("merokaHeader").classList.add("visible");
+        
         const confessions = await fetchRecentConfessions(6), feed = document.getElementById("confessionsFeed");
         confessions.forEach((c, i) => { const card = document.createElement("div"); card.className = "confession-card"; let meta = ''; if (c.specialty) meta += `<span>${c.specialty}</span>`; if (c.state) { if (meta) meta += '<span>·</span>'; meta += `<span>${c.state}</span>`; } if (c.created_at) { if (meta) meta += '<span>·</span>'; meta += `<span>${formatTimeAgo(c.created_at)}</span>`; } card.innerHTML = `<p>"${c.confession_text}"</p><div class="confession-meta">${meta}</div>`; feed.appendChild(card); setTimeout(() => card.classList.add("visible"), 200 + i * 200); });
-        setTimeout(() => document.getElementById("ctaSection").classList.add("visible"), 200 + confessions.length * 200 + 400);
-        await fetchConfessionCount(); await fetchKeywordStats();
+        
+        setTimeout(() => {
+          document.getElementById("ctaSection").classList.add("visible");
+          trackEvent('saw_social'); // Track when social section becomes visible
+        }, 200 + confessions.length * 200 + 400);
+        
+        await fetchConfessionCount();
+        await fetchKeywordStats();
       } catch (e) { alert('Error: ' + e.message); btn.disabled = false; btn.textContent = 'Release the weight'; }
+    });
+
+    // Track social link clicks
+    document.querySelectorAll('.social-link[data-track]').forEach(link => {
+      link.addEventListener('click', () => {
+        trackEvent(link.dataset.track, { specialty: selectedSpecialty, state: selectedState });
+      });
+    });
+
+    // Track partnership button click
+    document.getElementById('partnershipBtn')?.addEventListener('click', () => {
+      trackEvent('click_partnership', { specialty: selectedSpecialty, state: selectedState });
     });
 
     document.getElementById("thankYouIcon").addEventListener("click", function() { this.classList.add("clicked"); setTimeout(() => this.classList.remove("clicked"), 400); });
