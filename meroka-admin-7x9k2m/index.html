@@ -15,6 +15,7 @@
     .login-box { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; }
     .login-box h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; letter-spacing: -0.02em; }
     .login-box p { color: #a8a29e; font-size: 14px; margin-bottom: 24px; }
+    .login-logo { display: block; width: 120px; height: auto; margin: 0 auto 24px; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #a8a29e; }
     .form-group input { width: 100%; padding: 12px 14px; background: rgba(247,245,242,0.05); border: 1px solid rgba(247,245,242,0.1); border-radius: 8px; color: #F7F5F2; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
@@ -25,6 +26,10 @@
     .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .error-msg { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #f87171; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
     .error-msg.visible { display: block; }
+    
+    .google-btn { width: 100%; padding: 14px; background: #fff; border: 1px solid rgba(247,245,242,0.2); border-radius: 8px; color: #333; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .google-btn:hover { background: #f5f5f5; transform: translateY(-1px); }
+    .google-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     .dashboard { display: none; }
     .dashboard.visible { display: block; }
@@ -103,18 +108,19 @@
 
   <div class="login-container" id="loginContainer">
     <div class="login-box">
+      <img src=:https://hjomlxpovxgjweauiewt.supabase.co/storage/v1/object/public/assets/5f5c6c7a-9e84-4d11-9a6e-77305143cc44_thumb.png" alt="Meorka" class="login-logo">
       <h1>Meroka Admin Portal</h1>
       <p>Sign in to manage the Physician Confessional</p>
       <div class="error-msg" id="errorMsg"></div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="emailInput" placeholder="admin@example.com">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="passwordInput" placeholder="••••••••">
-      </div>
-      <button class="login-btn" id="loginBtn">Sign In</button>
+      <button class="google-btn" id="googleBtn">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
     </div>
   </div>
 
@@ -192,34 +198,32 @@
 
     const loginContainer = document.getElementById('loginContainer');
     const dashboard = document.getElementById('dashboard');
-    const emailInput = document.getElementById('emailInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const loginBtn = document.getElementById('loginBtn');
+    const googleBtn = document.getElementById('googleBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const errorMsg = document.getElementById('errorMsg');
     const adminEmail = document.getElementById('adminEmail');
 
     // ============= AUTH =============
-    async function signIn() {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      if (!email || !password) { showError('Please enter email and password'); return; }
-      loginBtn.disabled = true;
-      loginBtn.textContent = 'Signing in...';
+    async function signInWithGoogle() {
+      googleBtn.disabled = true;
+      googleBtn.innerHTML = '<span>Connecting...</span>';
+      
       try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname,
+            queryParams: {
+              hd: 'meroka.com'
+            }
+          }
+        });
         
-        const { data: adminData, error: adminError } = await supabaseClient.from('admins').select('email').eq('email', email).single();
-        if (adminError || !adminData) { 
-          await supabaseClient.auth.signOut(); 
-          throw new Error('You are not authorized as an admin'); 
-        }
-        showDashboard(email);
+        if (error) throw error;
       } catch (error) {
         showError(error.message);
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Sign In';
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Continue with Google';
       }
     }
 
@@ -240,8 +244,22 @@
     async function checkSession() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) {
-        const { data: adminData } = await supabaseClient.from('admins').select('email').eq('email', session.user.email).single();
-        if (adminData) showDashboard(session.user.email);
+        const userEmail = session.user.email;
+        
+        // Check if user is admin
+        const { data: adminData, error: adminError } = await supabaseClient
+          .from('admins')
+          .select('email')
+          .eq('email', userEmail)
+          .single();
+        
+        if (adminData) {
+          showDashboard(userEmail);
+        } else {
+          // User is authenticated but not an admin
+          showError('You are not authorized as an admin. Contact your administrator.');
+          await supabaseClient.auth.signOut();
+        }
       }
     }
 
@@ -492,10 +510,8 @@
     });
 
     // ============= EVENT LISTENERS =============
-    loginBtn.addEventListener('click', signIn);
+    googleBtn.addEventListener('click', signInWithGoogle);
     logoutBtn.addEventListener('click', signOut);
-    passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') signIn(); });
-    emailInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') signIn(); });
 
     // Check session on load
     checkSession();
