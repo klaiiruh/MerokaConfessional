@@ -3,33 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meroka Admin Portal - Physician Confessional</title>
+  <title>Meroka Admin Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #18212d; color: #F7F5F2; min-height: 100vh; }
+    body { font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; background: #18212d; color: #F7F5F2; min-height: 100vh; }
     
     .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .login-box { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; }
-    .login-box h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; letter-spacing: -0.02em; }
+    .login-box { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; text-align: center; }
+    .login-box h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; }
     .login-box p { color: #a8a29e; font-size: 14px; margin-bottom: 24px; }
     .login-logo { display: block; width: 120px; height: auto; margin: 0 auto 24px; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #a8a29e; }
-    .form-group input { width: 100%; padding: 12px 14px; background: rgba(247,245,242,0.05); border: 1px solid rgba(247,245,242,0.1); border-radius: 8px; color: #F7F5F2; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
-    .form-group input:focus { border-color: #9b420f; }
-    .form-group input::placeholder { color: #6b7280; }
-    .login-btn { width: 100%; padding: 14px; background: #9b420f; border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
-    .login-btn:hover { background: #b54d12; transform: translateY(-1px); }
-    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .error-msg { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #f87171; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
     .error-msg.visible { display: block; }
-    
     .google-btn { width: 100%; padding: 14px; background: #fff; border: 1px solid rgba(247,245,242,0.2); border-radius: 8px; color: #333; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .google-btn:hover { background: #f5f5f5; transform: translateY(-1px); }
-    .google-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .google-btn:hover { background: #f5f5f5; }
+    .google-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .dashboard { display: none; }
     .dashboard.visible { display: block; }
@@ -44,18 +36,20 @@
     .logout-btn { padding: 8px 14px; background: rgba(247,245,242,0.05); border: 1px solid rgba(247,245,242,0.12); border-radius: 6px; color: #F7F5F2; font-size: 13px; font-family: inherit; cursor: pointer; transition: all 0.2s; }
     .logout-btn:hover { background: rgba(220,38,38,0.2); border-color: rgba(220,38,38,0.4); }
 
-    .main-content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .main-content { max-width: 1400px; margin: 0 auto; padding: 24px; }
     
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
     .stat-card { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; }
     .stat-card .label { font-size: 12px; color: #a8a29e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-    .stat-card .value { font-size: 32px; font-weight: 700; color: #9b420f; }
-    .stat-card .subtext { font-size: 12px; color: #6b7280; margin-top: 4px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; color: #9b420f; }
 
-    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(247,245,242,0.08); padding-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid rgba(247,245,242,0.08); padding-bottom: 16px; flex-wrap: wrap; }
     .tab { padding: 10px 16px; background: transparent; border: 1px solid rgba(247,245,242,0.1); border-radius: 8px; color: #a8a29e; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; }
     .tab:hover { background: rgba(247,245,242,0.05); }
     .tab.active { background: #9b420f; border-color: #9b420f; color: #fff; }
+
+    .tab-content { display: none; }
+    .tab-content.visible { display: block; }
 
     .confessions-list { display: flex; flex-direction: column; gap: 12px; }
     .confession-item { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; transition: all 0.2s; }
@@ -63,7 +57,6 @@
     .confession-item.flagged { border-color: rgba(234,179,8,0.3); background: rgba(234,179,8,0.05); }
     .confession-text { font-size: 15px; line-height: 1.6; color: #d1ccc4; margin-bottom: 12px; }
     .confession-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: #6b7280; margin-bottom: 12px; }
-    .confession-meta span { display: flex; align-items: center; gap: 4px; }
     .confession-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .action-btn { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; border: 1px solid; }
     .action-btn.flag { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: #fbbf24; }
@@ -72,35 +65,79 @@
     .action-btn.delete { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
     .action-btn.delete:hover { background: #dc2626; color: #fff; }
     .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    .status-badge.flagged-badge { background: rgba(234,179,8,0.2); color: #fbbf24; }
 
-    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-    .chart-card { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; }
-    .chart-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-    .chart-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .chart-bar .label { width: 120px; font-size: 12px; color: #a8a29e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .chart-bar .bar-container { flex: 1; height: 24px; background: rgba(247,245,242,0.05); border-radius: 4px; overflow: hidden; }
-    .chart-bar .bar { height: 100%; background: linear-gradient(90deg, #9b420f, #b54d12); border-radius: 4px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
-    .chart-bar .bar span { font-size: 11px; font-weight: 600; color: #fff; }
+    /* Analytics Styles */
+    .analytics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .analytics-header h2 { font-size: 20px; font-weight: 600; }
+    .export-btn { padding: 10px 20px; background: #9b420f; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .export-btn:hover { background: #b54d12; }
+    .export-btn svg { width: 16px; height: 16px; }
+
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px; }
+    .analytics-card { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 24px; }
+    .analytics-card.full-width { grid-column: 1 / -1; }
+    .analytics-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .analytics-card h3 svg { width: 18px; height: 18px; color: #9b420f; }
+
+    /* Word Cloud */
+    .word-cloud { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 20px; }
+    .word-cloud .word { padding: 6px 12px; background: rgba(155,66,15,0.1); border-radius: 20px; color: #F7F5F2; font-weight: 500; transition: all 0.2s; cursor: default; }
+    .word-cloud .word:hover { background: rgba(155,66,15,0.3); transform: scale(1.05); }
+    .word-cloud .word.size-1 { font-size: 12px; opacity: 0.6; }
+    .word-cloud .word.size-2 { font-size: 14px; opacity: 0.7; }
+    .word-cloud .word.size-3 { font-size: 16px; opacity: 0.8; }
+    .word-cloud .word.size-4 { font-size: 20px; opacity: 0.9; }
+    .word-cloud .word.size-5 { font-size: 24px; opacity: 1; background: rgba(155,66,15,0.2); }
+
+    /* Bar Charts */
+    .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; }
+    .bar-label { width: 120px; font-size: 13px; color: #a8a29e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+    .bar-container { flex: 1; height: 28px; background: rgba(247,245,242,0.05); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, #9b420f, #b54d12); border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; transition: width 0.5s ease; }
+    .bar-fill span { font-size: 11px; font-weight: 600; color: #fff; }
+    .bar-value { width: 50px; font-size: 12px; color: #6b7280; text-align: right; }
+
+    /* US Map placeholder */
+    .us-map-container { position: relative; width: 100%; padding-bottom: 60%; background: rgba(247,245,242,0.02); border-radius: 8px; overflow: hidden; }
+    .us-map-container .map-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6b7280; }
+    .us-map-container .map-placeholder svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .state-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 16px; }
+    .state-item { display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(247,245,242,0.03); border-radius: 6px; font-size: 13px; }
+    .state-item .state-name { color: #a8a29e; }
+    .state-item .state-count { color: #9b420f; font-weight: 600; }
+
+    /* Specialty Heat Map */
+    .heat-map-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .heat-map-table th { padding: 10px 8px; text-align: left; color: #a8a29e; font-weight: 500; border-bottom: 1px solid rgba(247,245,242,0.1); }
+    .heat-map-table td { padding: 8px; border-bottom: 1px solid rgba(247,245,242,0.05); }
+    .heat-map-table .heat-cell { text-align: center; border-radius: 4px; font-weight: 500; }
+
+    /* Trending */
+    .trending-list { display: flex; flex-direction: column; gap: 8px; }
+    .trending-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: rgba(247,245,242,0.03); border-radius: 8px; }
+    .trending-keyword { flex: 1; font-weight: 500; }
+    .trending-count { color: #a8a29e; font-size: 13px; }
+    .trending-change { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+    .trending-change.up { background: rgba(34,197,94,0.2); color: #22c55e; }
+    .trending-change.down { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .trending-change.neutral { background: rgba(247,245,242,0.1); color: #6b7280; }
 
     .loading { text-align: center; padding: 40px; color: #a8a29e; }
     .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
     .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: #a8a29e; }
-
-    .tab-content { display: none; }
-    .tab-content.visible { display: block; }
-    
-    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
-    .status-badge.flagged-badge { background: rgba(234,179,8,0.2); color: #fbbf24; }
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: rgba(247,245,242,0.05); border-radius: 3px; }
     ::-webkit-scrollbar-thumb { background: rgba(155,66,15,0.5); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(155,66,15,0.8); }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+      .analytics-grid { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .header-right { flex-direction: column; align-items: flex-end; gap: 8px; }
-      .confession-actions { flex-wrap: wrap; }
+      .bar-label { width: 80px; }
     }
   </style>
 </head>
@@ -140,26 +177,15 @@
 
     <div class="main-content">
       <div class="stats-grid" id="statsGrid">
-        <div class="stat-card">
-          <div class="label">Total Confessions</div>
-          <div class="value" id="statTotal">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Today</div>
-          <div class="value" id="statToday">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">This Week</div>
-          <div class="value" id="statWeek">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Flagged</div>
-          <div class="value" id="statFlagged">-</div>
-        </div>
+        <div class="stat-card"><div class="label">Total Confessions</div><div class="value" id="statTotal">-</div></div>
+        <div class="stat-card"><div class="label">Today</div><div class="value" id="statToday">-</div></div>
+        <div class="stat-card"><div class="label">This Week</div><div class="value" id="statWeek">-</div></div>
+        <div class="stat-card"><div class="label">Flagged</div><div class="value" id="statFlagged">-</div></div>
+        <div class="stat-card"><div class="label">Avg Years Independent</div><div class="value" id="statAvgYears">-</div></div>
       </div>
 
       <div class="tabs">
-        <button class="tab active" data-tab="confessions">All Confessions</button>
+        <button class="tab active" data-tab="confessions">Confessions</button>
         <button class="tab" data-tab="flagged">Flagged</button>
         <button class="tab" data-tab="analytics">Analytics</button>
       </div>
@@ -173,18 +199,55 @@
       </div>
 
       <div class="tab-content" id="analyticsTab">
-        <div class="charts-grid">
-          <div class="chart-card">
-            <h3>By Specialty</h3>
-            <div id="specialtyChart"></div>
+        <div class="analytics-header">
+          <h2>Analytics Dashboard</h2>
+          <button class="export-btn" id="exportBtn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Export to Excel
+          </button>
+        </div>
+
+        <div class="analytics-grid">
+          <!-- Word Cloud -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>Keyword Pain Points</h3>
+            <div class="word-cloud" id="wordCloud"><div class="loading">Loading...</div></div>
           </div>
-          <div class="chart-card">
-            <h3>By State</h3>
-            <div id="stateChart"></div>
+
+          <!-- Trending Keywords -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>Trending Keywords (7 days)</h3>
+            <div class="trending-list" id="trendingList"><div class="loading">Loading...</div></div>
           </div>
-          <div class="chart-card">
-            <h3>Top Keywords</h3>
-            <div id="keywordChart"></div>
+
+          <!-- Geographic Distribution -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Confessions by State</h3>
+            <div class="state-list" id="stateList"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Specialty Breakdown -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Specialty Breakdown</h3>
+            <div class="bar-chart" id="specialtyChart"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Years Independent -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Years Independent</h3>
+            <div class="bar-chart" id="yearsChart"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Specialty Concerns -->
+          <div class="analytics-card">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Top Concerns by Specialty</h3>
+            <div id="specialtyConcerns"><div class="loading">Loading...</div></div>
+          </div>
+
+          <!-- Specialty by State Heat Map -->
+          <div class="analytics-card full-width">
+            <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>Specialty Distribution by State</h3>
+            <div style="overflow-x: auto;" id="heatMapContainer"><div class="loading">Loading...</div></div>
           </div>
         </div>
       </div>
@@ -196,29 +259,26 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb21seHBvdnhnandlYXVpZXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODQzMDUsImV4cCI6MjA4NDE2MDMwNX0.UcevzUHjnhikSQsHUuK4sfWM7ZFjVJ-X9pdaokUYmxo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Store analytics data for export
+    let analyticsData = {};
+
     const loginContainer = document.getElementById('loginContainer');
     const dashboard = document.getElementById('dashboard');
     const googleBtn = document.getElementById('googleBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const errorMsg = document.getElementById('errorMsg');
     const adminEmail = document.getElementById('adminEmail');
+    const exportBtn = document.getElementById('exportBtn');
 
     // ============= AUTH =============
     async function signInWithGoogle() {
       googleBtn.disabled = true;
       googleBtn.innerHTML = '<span>Connecting...</span>';
-      
       try {
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
-          options: {
-            redirectTo: 'https://merokaconfessional.vercel.app/meroka-admin-7x9k2m',
-            queryParams: {
-              hd: 'meroka.com'
-            }
-          }
+          options: { redirectTo: 'https://merokaconfessional.vercel.app/meroka-admin-7x9k2m', queryParams: { hd: 'meroka.com' } }
         });
-        
         if (error) throw error;
       } catch (error) {
         showError(error.message);
@@ -231,8 +291,6 @@
       await supabaseClient.auth.signOut();
       dashboard.classList.remove('visible');
       loginContainer.classList.remove('hidden');
-      emailInput.value = '';
-      passwordInput.value = '';
     }
 
     function showError(msg) {
@@ -245,8 +303,6 @@
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) {
         const userEmail = session.user.email;
-        
-        // Check if user has @meroka.com email
         if (userEmail.endsWith('@meroka.com')) {
           showDashboard(userEmail);
         } else {
@@ -267,223 +323,240 @@
     // ============= DATA LOADING =============
     async function loadStats() {
       try {
-        const { data, error } = await supabaseClient.from('admin_stats').select('*').single();
-        if (error) throw error;
-        document.getElementById('statTotal').textContent = data.total_confessions || 0;
-        document.getElementById('statToday').textContent = data.confessions_today || 0;
-        document.getElementById('statWeek').textContent = data.confessions_this_week || 0;
-        document.getElementById('statFlagged').textContent = data.flagged_count || 0;
-      } catch (error) { console.error('Error loading stats:', error); }
+        const { data } = await supabaseClient.from('admin_stats').select('*').single();
+        if (data) {
+          document.getElementById('statTotal').textContent = data.total_confessions || 0;
+          document.getElementById('statToday').textContent = data.confessions_today || 0;
+          document.getElementById('statWeek').textContent = data.confessions_this_week || 0;
+          document.getElementById('statFlagged').textContent = data.flagged_count || 0;
+        }
+        
+        // Calculate average years
+        const { data: yearsData } = await supabaseClient.from('years_independent_stats').select('*');
+        if (yearsData) {
+          analyticsData.yearsIndependent = yearsData;
+          const yearMap = { '0-2 years': 1, '3-5 years': 4, '6-10 years': 8, '10+ years': 12 };
+          let total = 0, count = 0;
+          yearsData.forEach(y => {
+            if (yearMap[y.years_independent]) {
+              total += yearMap[y.years_independent] * y.confession_count;
+              count += y.confession_count;
+            }
+          });
+          document.getElementById('statAvgYears').textContent = count > 0 ? (total / count).toFixed(1) : '-';
+        }
+      } catch (e) { console.error('Stats error:', e); }
     }
 
     async function loadConfessions(filter = 'all') {
-      const listMap = { all: 'confessionsList', flagged: 'flaggedList', hidden: 'hiddenList' };
-      const list = document.getElementById(listMap[filter]);
-      if (!list) return;
-      
+      const listId = filter === 'flagged' ? 'flaggedList' : 'confessionsList';
+      const list = document.getElementById(listId);
       list.innerHTML = '<div class="loading">Loading...</div>';
       
       try {
         let query = supabaseClient.from('confessions').select('*').order('created_at', { ascending: false });
-        
         if (filter === 'flagged') query = query.eq('is_flagged', true);
-        if (filter === 'hidden') query = query.eq('is_hidden', true);
-        
         const { data, error } = await query.limit(100);
         if (error) throw error;
         
         if (!data || data.length === 0) {
-          const messages = {
-            all: { title: 'No confessions yet', desc: 'Confessions will appear here' },
-            flagged: { title: 'No flagged confessions', desc: 'Nothing has been flagged yet' },
-            hidden: { title: 'No hidden confessions', desc: 'Nothing has been hidden yet' }
-          };
-          list.innerHTML = `<div class="empty-state"><h3>${messages[filter].title}</h3><p>${messages[filter].desc}</p></div>`;
+          list.innerHTML = `<div class="empty-state"><h3>No confessions${filter === 'flagged' ? ' flagged' : ''}</h3></div>`;
           return;
         }
         
         list.innerHTML = data.map(c => renderConfessionCard(c)).join('');
-        
-        // Attach event listeners
-        list.querySelectorAll('.action-btn').forEach(btn => {
-          btn.addEventListener('click', handleAction);
-        });
-        
+        list.querySelectorAll('.action-btn').forEach(btn => btn.addEventListener('click', handleAction));
       } catch (error) {
-        console.error('Error loading confessions:', error);
-        list.innerHTML = `<div class="empty-state"><h3>Error loading</h3><p>${error.message}</p></div>`;
+        list.innerHTML = `<div class="empty-state"><h3>Error</h3><p>${error.message}</p></div>`;
       }
     }
 
     function renderConfessionCard(c) {
-      const hiddenClass = c.is_hidden ? 'is-hidden' : '';
-      const flaggedClass = c.is_flagged ? 'flagged' : '';
-      
-      let badges = '';
-      if (c.is_hidden) badges += '<span class="status-badge hidden-badge">HIDDEN</span>';
-      if (c.is_flagged) badges += '<span class="status-badge flagged-badge">FLAGGED</span>';
-      
+      const badges = c.is_flagged ? '<span class="status-badge flagged-badge">FLAGGED</span>' : '';
       return `
-        <div class="confession-item ${flaggedClass} ${hiddenClass}" data-id="${c.id}">
+        <div class="confession-item ${c.is_flagged ? 'flagged' : ''}" data-id="${c.id}">
           <div class="confession-text">"${escapeHtml(c.confession_text)}"${badges}</div>
           <div class="confession-meta">
-            <span>${c.specialty || 'No specialty'}</span>
-            <span>•</span>
-            <span>${c.state || 'No state'}</span>
-            <span>•</span>
-            <span>${c.years_independent || 'N/A'}</span>
-            <span>•</span>
+            <span>${c.specialty || 'No specialty'}</span><span>•</span>
+            <span>${c.state || 'No state'}</span><span>•</span>
+            <span>${c.years_independent || 'N/A'}</span><span>•</span>
             <span>${formatDate(c.created_at)}</span>
           </div>
           <div class="confession-actions">
-            <button class="action-btn flag ${c.is_flagged ? 'active' : ''}" data-action="flag" data-id="${c.id}" data-current="${c.is_flagged}">
-              ${c.is_flagged ? 'Unflag' : 'Flag'}
-            </button>
-            <button class="action-btn delete" data-action="delete" data-id="${c.id}">
-              Delete
-            </button>
+            <button class="action-btn flag ${c.is_flagged ? 'active' : ''}" data-action="flag" data-id="${c.id}" data-current="${c.is_flagged}">${c.is_flagged ? 'Unflag' : 'Flag'}</button>
+            <button class="action-btn delete" data-action="delete" data-id="${c.id}">Delete</button>
           </div>
-        </div>
-      `;
+        </div>`;
     }
 
-    // ============= ACTIONS =============
     async function handleAction(e) {
-      const btn = e.target;
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
-      const current = btn.dataset.current === 'true';
-      
+      const btn = e.target, action = btn.dataset.action, id = btn.dataset.id, current = btn.dataset.current === 'true';
       btn.disabled = true;
-      
       try {
         if (action === 'flag') {
-          await toggleFlag(id, !current);
-        } else if (action === 'delete') {
-          if (confirm('Are you sure you want to permanently delete this confession? This cannot be undone.')) {
-            await deleteConfession(id);
-          }
+          await supabaseClient.from('confessions').update({ is_flagged: !current, flagged_at: !current ? new Date().toISOString() : null }).eq('id', id);
+        } else if (action === 'delete' && confirm('Delete this confession permanently?')) {
+          await supabaseClient.from('keyword_matches').delete().eq('confession_id', id);
+          await supabaseClient.from('confessions').delete().eq('id', id);
         }
-      } catch (error) {
-        alert('Error: ' + error.message);
-      }
-      
+        loadStats(); loadConfessions('all'); loadConfessions('flagged');
+      } catch (error) { alert('Error: ' + error.message); }
       btn.disabled = false;
-    }
-
-    async function toggleFlag(id, flagged) {
-      console.log('Toggling flag:', id, flagged);
-      
-      const updateData = { 
-        is_flagged: flagged, 
-        flagged_at: flagged ? new Date().toISOString() : null 
-      };
-      
-      const { data, error } = await supabaseClient
-        .from('confessions')
-        .update(updateData)
-        .eq('id', id)
-        .select();
-      
-      if (error) {
-        console.error('Flag error:', error);
-        throw error;
-      }
-      
-      console.log('Flag result:', data);
-      refreshAllLists();
-    }
-
-    async function deleteConfession(id) {
-      console.log('Deleting:', id);
-      
-      // First delete related keyword_matches
-      const { error: kwError } = await supabaseClient
-        .from('keyword_matches')
-        .delete()
-        .eq('confession_id', id);
-      
-      if (kwError) {
-        console.error('Keyword delete error:', kwError);
-        // Continue anyway, might not have any matches
-      }
-      
-      // Then delete the confession
-      const { data, error } = await supabaseClient
-        .from('confessions')
-        .delete()
-        .eq('id', id)
-        .select();
-      
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
-      }
-      
-      console.log('Delete result:', data);
-      refreshAllLists();
-    }
-
-    function refreshAllLists() {
-      console.log('Refreshing lists...');
-      loadStats();
-      const activeTab = document.querySelector('.tab.active');
-      console.log('Active tab:', activeTab?.dataset?.tab);
-      if (activeTab) {
-        const tabName = activeTab.dataset.tab;
-        if (tabName === 'confessions') loadConfessions('all');
-        else if (tabName === 'flagged') loadConfessions('flagged');
-        else if (tabName === 'analytics') loadAnalytics();
-      } else {
-        loadConfessions('all');
-      }
     }
 
     // ============= ANALYTICS =============
     async function loadAnalytics() {
+      await Promise.all([loadWordCloud(), loadTrending(), loadGeoStats(), loadSpecialtyChart(), loadYearsChart(), loadSpecialtyConcerns(), loadHeatMap()]);
+    }
+
+    async function loadWordCloud() {
       try {
-        const { data: specialtyData } = await supabaseClient.from('confessions_by_specialty').select('*').limit(8);
-        if (specialtyData && specialtyData.length > 0) {
-          const maxSpecialty = Math.max(...specialtyData.map(d => d.count));
-          document.getElementById('specialtyChart').innerHTML = specialtyData.map(d => `
-            <div class="chart-bar"><div class="label">${d.specialty}</div><div class="bar-container"><div class="bar" style="width: ${(d.count / maxSpecialty) * 100}%"><span>${d.count}</span></div></div></div>
-          `).join('');
-        }
-      } catch (e) { console.error('Specialty chart error:', e); }
+        const { data } = await supabaseClient.from('keyword_stats_ranked').select('*').limit(30);
+        analyticsData.keywords = data;
+        if (!data || data.length === 0) { document.getElementById('wordCloud').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        const maxCount = Math.max(...data.map(d => d.total_count));
+        document.getElementById('wordCloud').innerHTML = data.map(d => {
+          const size = Math.ceil((d.total_count / maxCount) * 5);
+          return `<span class="word size-${size}" title="${d.total_count} mentions (${d.percentage}%)">${d.keyword}</span>`;
+        }).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadTrending() {
+      try {
+        const { data } = await supabaseClient.from('trending_keywords').select('*').limit(10);
+        analyticsData.trending = data;
+        if (!data || data.length === 0) { document.getElementById('trendingList').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        document.getElementById('trendingList').innerHTML = data.map(d => {
+          const changeClass = d.change > 0 ? 'up' : d.change < 0 ? 'down' : 'neutral';
+          const changeText = d.change > 0 ? `+${d.change}` : d.change;
+          return `<div class="trending-item"><span class="trending-keyword">${d.keyword}</span><span class="trending-count">${d.recent_count} this week</span><span class="trending-change ${changeClass}">${changeText}</span></div>`;
+        }).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadGeoStats() {
+      try {
+        const { data } = await supabaseClient.from('geo_stats').select('*');
+        analyticsData.geoStats = data;
+        if (!data || data.length === 0) { document.getElementById('stateList').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        document.getElementById('stateList').innerHTML = data.filter(d => d.state !== 'Not specified').slice(0, 20).map(d => 
+          `<div class="state-item"><span class="state-name">${d.state}</span><span class="state-count">${d.confession_count}</span></div>`
+        ).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadSpecialtyChart() {
+      try {
+        const { data } = await supabaseClient.from('specialty_stats').select('*');
+        analyticsData.specialtyStats = data;
+        if (!data || data.length === 0) { document.getElementById('specialtyChart').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        const max = Math.max(...data.map(d => d.confession_count));
+        document.getElementById('specialtyChart').innerHTML = data.slice(0, 8).map(d => 
+          `<div class="bar-row"><span class="bar-label">${d.specialty}</span><div class="bar-container"><div class="bar-fill" style="width:${(d.confession_count/max)*100}%"><span>${d.confession_count}</span></div></div><span class="bar-value">${d.percentage}%</span></div>`
+        ).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadYearsChart() {
+      try {
+        const { data } = await supabaseClient.from('years_independent_stats').select('*');
+        if (!data || data.length === 0) { document.getElementById('yearsChart').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        const max = Math.max(...data.map(d => d.confession_count));
+        document.getElementById('yearsChart').innerHTML = data.filter(d => d.years_independent !== 'Not specified').map(d => 
+          `<div class="bar-row"><span class="bar-label">${d.years_independent}</span><div class="bar-container"><div class="bar-fill" style="width:${(d.confession_count/max)*100}%"><span>${d.confession_count}</span></div></div><span class="bar-value">${d.percentage}%</span></div>`
+        ).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadSpecialtyConcerns() {
+      try {
+        const { data } = await supabaseClient.from('keywords_by_specialty').select('*');
+        analyticsData.specialtyConcerns = data;
+        if (!data || data.length === 0) { document.getElementById('specialtyConcerns').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        const grouped = {};
+        data.forEach(d => {
+          if (!grouped[d.specialty]) grouped[d.specialty] = [];
+          if (grouped[d.specialty].length < 5) grouped[d.specialty].push(d);
+        });
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">';
+        Object.entries(grouped).slice(0, 6).forEach(([specialty, keywords]) => {
+          html += `<div style="background:rgba(247,245,242,0.03);padding:12px;border-radius:8px;"><strong style="font-size:13px;color:#9b420f;">${specialty}</strong><div style="margin-top:8px;font-size:12px;color:#a8a29e;">${keywords.map(k => k.keyword).join(', ')}</div></div>`;
+        });
+        html += '</div>';
+        document.getElementById('specialtyConcerns').innerHTML = html;
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadHeatMap() {
+      try {
+        const { data } = await supabaseClient.from('specialty_by_state').select('*');
+        analyticsData.specialtyByState = data;
+        if (!data || data.length === 0) { document.getElementById('heatMapContainer').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        
+        const states = [...new Set(data.map(d => d.state))].filter(s => s !== 'Not specified').slice(0, 10);
+        const specialties = [...new Set(data.map(d => d.specialty))].filter(s => s !== 'Not specified').slice(0, 8);
+        const maxVal = Math.max(...data.map(d => d.confession_count));
+        
+        let html = '<table class="heat-map-table"><thead><tr><th></th>';
+        specialties.forEach(s => html += `<th>${s}</th>`);
+        html += '</tr></thead><tbody>';
+        
+        states.forEach(state => {
+          html += `<tr><td style="font-weight:500;">${state}</td>`;
+          specialties.forEach(spec => {
+            const item = data.find(d => d.state === state && d.specialty === spec);
+            const count = item ? item.confession_count : 0;
+            const intensity = count / maxVal;
+            const bg = count > 0 ? `rgba(155,66,15,${0.2 + intensity * 0.6})` : 'transparent';
+            html += `<td class="heat-cell" style="background:${bg}">${count || '-'}</td>`;
+          });
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        document.getElementById('heatMapContainer').innerHTML = html;
+      } catch (e) { console.error(e); }
+    }
+
+    // ============= EXPORT =============
+    function exportToExcel() {
+      const wb = XLSX.utils.book_new();
       
-      try {
-        const { data: stateData } = await supabaseClient.from('confessions_by_state').select('*').limit(8);
-        if (stateData && stateData.length > 0) {
-          const maxState = Math.max(...stateData.map(d => d.count));
-          document.getElementById('stateChart').innerHTML = stateData.map(d => `
-            <div class="chart-bar"><div class="label">${d.state}</div><div class="bar-container"><div class="bar" style="width: ${(d.count / maxState) * 100}%"><span>${d.count}</span></div></div></div>
-          `).join('');
-        }
-      } catch (e) { console.error('State chart error:', e); }
+      if (analyticsData.keywords) {
+        const ws1 = XLSX.utils.json_to_sheet(analyticsData.keywords);
+        XLSX.utils.book_append_sheet(wb, ws1, 'Keywords');
+      }
+      if (analyticsData.trending) {
+        const ws2 = XLSX.utils.json_to_sheet(analyticsData.trending);
+        XLSX.utils.book_append_sheet(wb, ws2, 'Trending');
+      }
+      if (analyticsData.geoStats) {
+        const ws3 = XLSX.utils.json_to_sheet(analyticsData.geoStats);
+        XLSX.utils.book_append_sheet(wb, ws3, 'By State');
+      }
+      if (analyticsData.specialtyStats) {
+        const ws4 = XLSX.utils.json_to_sheet(analyticsData.specialtyStats);
+        XLSX.utils.book_append_sheet(wb, ws4, 'By Specialty');
+      }
+      if (analyticsData.yearsIndependent) {
+        const ws5 = XLSX.utils.json_to_sheet(analyticsData.yearsIndependent);
+        XLSX.utils.book_append_sheet(wb, ws5, 'Years Independent');
+      }
+      if (analyticsData.specialtyByState) {
+        const ws6 = XLSX.utils.json_to_sheet(analyticsData.specialtyByState);
+        XLSX.utils.book_append_sheet(wb, ws6, 'Specialty by State');
+      }
+      if (analyticsData.specialtyConcerns) {
+        const ws7 = XLSX.utils.json_to_sheet(analyticsData.specialtyConcerns);
+        XLSX.utils.book_append_sheet(wb, ws7, 'Specialty Concerns');
+      }
       
-      try {
-        const { data: keywordData } = await supabaseClient.from('keyword_stats').select('*').limit(10);
-        if (keywordData && keywordData.length > 0) {
-          const maxKeyword = Math.max(...keywordData.map(d => d.total_count));
-          document.getElementById('keywordChart').innerHTML = keywordData.map(d => `
-            <div class="chart-bar"><div class="label">${d.keyword}</div><div class="bar-container"><div class="bar" style="width: ${(d.total_count / maxKeyword) * 100}%"><span>${d.total_count} (${d.percentage}%)</span></div></div></div>
-          `).join('');
-        }
-      } catch (e) { console.error('Keyword chart error:', e); }
+      XLSX.writeFile(wb, `meroka-analytics-${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
     // ============= HELPERS =============
-    function escapeHtml(text) { 
-      const div = document.createElement('div'); 
-      div.textContent = text; 
-      return div.innerHTML; 
-    }
-    
-    function formatDate(dateString) { 
-      return new Date(dateString).toLocaleDateString('en-US', { 
-        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-      }); 
-    }
+    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    function formatDate(d) { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
 
     // ============= TABS =============
     document.querySelectorAll('.tab').forEach(tab => {
@@ -491,22 +564,17 @@
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('visible'));
         tab.classList.add('active');
-        
-        const tabName = tab.dataset.tab;
-        document.getElementById(tabName + 'Tab').classList.add('visible');
-        
-        if (tabName === 'confessions') loadConfessions('all');
-        else if (tabName === 'flagged') loadConfessions('flagged');
-        else if (tabName === 'hidden') loadConfessions('hidden');
-        else if (tabName === 'analytics') loadAnalytics();
+        document.getElementById(tab.dataset.tab + 'Tab').classList.add('visible');
+        if (tab.dataset.tab === 'confessions') loadConfessions('all');
+        else if (tab.dataset.tab === 'flagged') loadConfessions('flagged');
+        else if (tab.dataset.tab === 'analytics') loadAnalytics();
       });
     });
 
     // ============= EVENT LISTENERS =============
     googleBtn.addEventListener('click', signInWithGoogle);
     logoutBtn.addEventListener('click', signOut);
-
-    // Check session on load
+    exportBtn.addEventListener('click', exportToExcel);
     checkSession();
   </script>
 </body>
