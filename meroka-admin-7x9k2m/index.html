@@ -56,7 +56,6 @@
     .confession-item { background: rgba(247,245,242,0.03); border: 1px solid rgba(247,245,242,0.08); border-radius: 12px; padding: 20px; transition: all 0.2s; }
     .confession-item:hover { border-color: rgba(247,245,242,0.15); }
     .confession-item.flagged { border-color: rgba(234,179,8,0.3); background: rgba(234,179,8,0.05); }
-    .confession-item.is-hidden { opacity: 0.5; border-color: rgba(220,38,38,0.3); }
     .confession-text { font-size: 15px; line-height: 1.6; color: #d1ccc4; margin-bottom: 12px; }
     .confession-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: #6b7280; margin-bottom: 12px; }
     .confession-meta span { display: flex; align-items: center; gap: 4px; }
@@ -65,9 +64,6 @@
     .action-btn.flag { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: #fbbf24; }
     .action-btn.flag:hover { background: rgba(234,179,8,0.2); }
     .action-btn.flag.active { background: #fbbf24; color: #000; }
-    .action-btn.hide { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
-    .action-btn.hide:hover { background: rgba(220,38,38,0.2); }
-    .action-btn.hide.active { background: #dc2626; color: #fff; }
     .action-btn.delete { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
     .action-btn.delete:hover { background: #dc2626; color: #fff; }
     .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -89,7 +85,6 @@
     .tab-content.visible { display: block; }
     
     .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
-    .status-badge.hidden-badge { background: rgba(220,38,38,0.2); color: #f87171; }
     .status-badge.flagged-badge { background: rgba(234,179,8,0.2); color: #fbbf24; }
 
     ::-webkit-scrollbar { width: 6px; }
@@ -160,7 +155,6 @@
       <div class="tabs">
         <button class="tab active" data-tab="confessions">All Confessions</button>
         <button class="tab" data-tab="flagged">Flagged</button>
-        <button class="tab" data-tab="hidden">Hidden</button>
         <button class="tab" data-tab="analytics">Analytics</button>
       </div>
 
@@ -170,10 +164,6 @@
 
       <div class="tab-content" id="flaggedTab">
         <div class="confessions-list" id="flaggedList"></div>
-      </div>
-
-      <div class="tab-content" id="hiddenTab">
-        <div class="confessions-list" id="hiddenList"></div>
       </div>
 
       <div class="tab-content" id="analyticsTab">
@@ -338,9 +328,6 @@
             <button class="action-btn flag ${c.is_flagged ? 'active' : ''}" data-action="flag" data-id="${c.id}" data-current="${c.is_flagged}">
               ${c.is_flagged ? 'Unflag' : 'Flag'}
             </button>
-            <button class="action-btn hide ${c.is_hidden ? 'active' : ''}" data-action="hide" data-id="${c.id}" data-current="${c.is_hidden}">
-              ${c.is_hidden ? 'Unhide' : 'Hide'}
-            </button>
             <button class="action-btn delete" data-action="delete" data-id="${c.id}">
               Delete
             </button>
@@ -361,8 +348,6 @@
       try {
         if (action === 'flag') {
           await toggleFlag(id, !current);
-        } else if (action === 'hide') {
-          await toggleHide(id, !current);
         } else if (action === 'delete') {
           if (confirm('Are you sure you want to permanently delete this confession? This cannot be undone.')) {
             await deleteConfession(id);
@@ -398,24 +383,6 @@
       refreshAllLists();
     }
 
-    async function toggleHide(id, hidden) {
-      console.log('Toggling hide:', id, hidden);
-      
-      const { data, error } = await supabaseClient
-        .from('confessions')
-        .update({ is_hidden: hidden })
-        .eq('id', id)
-        .select();
-      
-      if (error) {
-        console.error('Hide error:', error);
-        throw error;
-      }
-      
-      console.log('Hide result:', data);
-      refreshAllLists();
-    }
-
     async function deleteConfession(id) {
       console.log('Deleting:', id);
       
@@ -447,13 +414,17 @@
     }
 
     function refreshAllLists() {
+      console.log('Refreshing lists...');
       loadStats();
       const activeTab = document.querySelector('.tab.active');
+      console.log('Active tab:', activeTab?.dataset?.tab);
       if (activeTab) {
         const tabName = activeTab.dataset.tab;
         if (tabName === 'confessions') loadConfessions('all');
         else if (tabName === 'flagged') loadConfessions('flagged');
-        else if (tabName === 'hidden') loadConfessions('hidden');
+        else if (tabName === 'analytics') loadAnalytics();
+      } else {
+        loadConfessions('all');
       }
     }
 
