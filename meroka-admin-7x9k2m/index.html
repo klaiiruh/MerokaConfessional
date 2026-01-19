@@ -446,29 +446,48 @@
       await Promise.all([loadFunnel(), loadClickStats(), loadClicksBySpecialty(), loadClicksByState(), loadWordCloud(), loadTrending(), loadGeoStats(), loadSpecialtyChart(), loadYearsChart(), loadSpecialtyConcerns(), loadHeatMap()]);
     }
 
+    // Replace the loadFunnel function in your admin dashboard
+
     async function loadFunnel() {
       try {
         const { data } = await supabaseClient.from('conversion_funnel').select('*').single();
         analyticsData.funnel = data;
-        if (!data) { document.getElementById('funnelContainer').innerHTML = '<div class="empty-state">No data</div>'; return; }
+        if (!data) { 
+          document.getElementById('funnelContainer').innerHTML = '<div class="empty-state">No data</div>'; 
+          return; 
+        }
         
-        const maxVal = Math.max(data.page_views || 1, 1);
+        // Only show 3 steps now (removed "Saw Social")
         const steps = [
           { label: 'Page Views', value: data.page_views || 0 },
           { label: 'Started Typing', value: data.started_typing || 0 },
-          { label: 'Submitted', value: data.submitted || 0 },
-          { label: 'Saw Social', value: data.saw_social || 0 }
+          { label: 'Submitted', value: data.submitted || 0 }
         ];
+        
+        const maxVal = Math.max(data.page_views || 1, 1);
         
         let html = '';
         steps.forEach((step, i) => {
           const height = Math.max((step.value / maxVal) * 150, 20);
-          const prevVal = i > 0 ? steps[i-1].value : step.value;
-          const rate = prevVal > 0 ? ((step.value / prevVal) * 100).toFixed(1) : 0;
-          html += `<div class="funnel-step"><div class="funnel-bar" style="height:${height}px"></div><div class="funnel-value">${step.value}</div><div class="funnel-label">${step.label}</div>${i > 0 ? `<div class="funnel-rate">${rate}% conversion</div>` : ''}</div>`;
+          // Always calculate rate from page_views (top of funnel)
+          const rate = data.page_views > 0 
+            ? ((step.value / data.page_views) * 100).toFixed(1) 
+            : 0;
+          
+          html += `
+            <div class="funnel-step">
+              <div class="funnel-bar" style="height:${height}px"></div>
+              <div class="funnel-value">${step.value}</div>
+              <div class="funnel-label">${step.label}</div>
+              ${i > 0 ? `<div class="funnel-rate">${rate}% of visitors</div>` : ''}
+            </div>`;
         });
+        
         document.getElementById('funnelContainer').innerHTML = html;
-      } catch (e) { console.error('Funnel error:', e); document.getElementById('funnelContainer').innerHTML = '<div class="empty-state">No data yet</div>'; }
+      } catch (e) { 
+        console.error('Funnel error:', e); 
+        document.getElementById('funnelContainer').innerHTML = '<div class="empty-state">No data yet</div>'; 
+      }
     }
 
     async function loadClickStats() {
